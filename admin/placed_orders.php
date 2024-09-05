@@ -128,9 +128,9 @@ if (isset($_GET['delete'])) {
                 <tr>
                     <td><?= $fetch_orders['placed_on']; ?></td>
                     <td><?= $fetch_orders['name']; ?></td>
-                    <td><?= $fetch_orders['number']; ?></td>
+                    <td><?= $fetch_orders['mobile']; ?></td>
                     <td><?= $fetch_orders['address']; ?></td>
-                    <td><?= $fetch_orders['total_products']; ?></td>
+                    <td><?= $fetch_orders['product_quantities']; ?></td>
                     <td>&#8369;<?= $fetch_orders['total_price']; ?>/-</td>
                     <td>
                         <?php if (!empty($fetch_orders['receipt_image'])): ?>
@@ -199,9 +199,9 @@ if (isset($_GET['delete'])) {
                 <tr>
                     <td><?= $fetch_orders['placed_on']; ?></td>
                     <td><?= $fetch_orders['name']; ?></td>
-                    <td><?= $fetch_orders['number']; ?></td>
+                    <td><?= $fetch_orders['mobile']; ?></td>
                     <td><?= $fetch_orders['address']; ?></td>
-                    <td><?= $fetch_orders['total_products']; ?></td>
+                    <td><?= $fetch_orders['product_quantities']; ?></td>
                     <td>&#8369;<?= $fetch_orders['total_price']; ?>/-</td>
                     <td>
                         <?php if (!empty($fetch_orders['receipt_image'])): ?>
@@ -241,6 +241,5 @@ if (isset($_GET['delete'])) {
 </section>
 
 <script src="../js/admin_script.js"></script>
-
 </body>
 </html>

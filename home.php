@@ -12,6 +12,19 @@ if(isset($_SESSION['user_id'])){
 
 include 'components/wishlist_cart.php';
 
+// Get the category from the URL
+$category = isset($_GET['category']) ? $_GET['category'] : '';
+
+// Prepare SQL query based on category
+if ($category) {
+   $select_products = $conn->prepare("SELECT * FROM `products` WHERE `category` = :category LIMIT 6");
+   $select_products->bindParam(':category', $category);
+} else {
+   $select_products = $conn->prepare("SELECT * FROM `products` LIMIT 6");
+}
+
+$select_products->execute();
+
 ?>
 
 <!DOCTYPE html>
@@ -94,30 +107,30 @@ include 'components/wishlist_cart.php';
 
    <div class="swiper-wrapper">
 
-   <a href="category.php?category=laptop" class="swiper-slide slide">
+   <a href="category.php?category=Car Exhaust" class="swiper-slide slide">
       <img src="images/icon-1.png" alt="">
       <h3>Car Exhaust</h3>
    </a>
 
-   <a href="category.php?category=tv" class="swiper-slide slide">
+   <a href="category.php?category=Motorcycle Exhaust" class="swiper-slide slide">
       <img src="images/icon-2.png" alt="">
       <h3>Motorcycle Exhaust</h3>
    </a>
 
-   <a href="category.php?category=camera" class="swiper-slide slide">
+   <a href="category.php?category=Exhaust Auxiliaries" class="swiper-slide slide">
       <img src="images/icon-3.png" alt="">
       <h3>Exhaust Auxiliaries</h3>
    </a>
 
-   <a href="category.php?category=mouse" class="swiper-slide slide">
-      <img src="images/icon-4.png" alt="">
+   <a href="category.php?category=Air Filter" class="swiper-slide slide">
+      <img src="images/icon-4.png" >
       <h3>Air Filter</h3>
    </a>
 
-   <a href="category.php?category=fridge" class="swiper-slide slide">
+   <!-- <a href="category.php?category=others" class="swiper-slide slide">
       <img src="images/icon-5.png" alt="">
       <h3>Others</h3>
-   </a>
+   </a> -->
 
    </div>
 
@@ -134,34 +147,33 @@ include 'components/wishlist_cart.php';
    <div class="swiper products-slider">
 
    <div class="swiper-wrapper">
-
    <?php
-     $select_products = $conn->prepare("SELECT * FROM `products` LIMIT 6"); 
-     $select_products->execute();
-     if($select_products->rowCount() > 0){
-      while($fetch_product = $select_products->fetch(PDO::FETCH_ASSOC)){
-   ?>
-   <form action="" method="post" class="swiper-slide slide">
-      <input type="hidden" name="pid" value="<?= $fetch_product['id']; ?>">
-      <input type="hidden" name="name" value="<?= $fetch_product['name']; ?>">
-      <input type="hidden" name="price" value="<?= $fetch_product['price']; ?>">
-      <input type="hidden" name="image" value="<?= $fetch_product['image_01']; ?>">
-      <button class="fas fa-heart" type="submit" name="add_to_wishlist"></button>
-      <a href="quick_view.php?pid=<?= $fetch_product['id']; ?>" class="fas fa-eye"></a>
-      <img src="uploaded_img/<?= $fetch_product['image_01']; ?>" alt="">
-      <div class="name"><?= $fetch_product['name']; ?></div>
-      <div class="flex">
-         <div class="price"><span>$</span><?= $fetch_product['price']; ?><span>/-</span></div>
-         <input type="number" name="qty" class="qty" min="1" max="99" onkeypress="if(this.value.length == 2) return false;" value="1">
-      </div>
-      <input type="submit" value="add to cart" class="btn" name="add_to_cart">
-   </form>
-   <?php
-      }
-   }else{
-      echo '<p class="empty">no products added yet!</p>';
+if ($select_products->rowCount() > 0) {
+   while($fetch_product = $select_products->fetch(PDO::FETCH_ASSOC)) {
+?>
+<form action="" method="post" class="swiper-slide slide">
+   <input type="hidden" name="pid" value="<?= $fetch_product['id']; ?>">
+   <input type="hidden" name="name" value="<?= $fetch_product['name']; ?>">
+   <input type="hidden" name="price" value="<?= $fetch_product['price']; ?>">
+   <input type="hidden" name="image" value="<?= $fetch_product['image_01']; ?>">
+   <button class="fas fa-heart" type="submit" name="add_to_wishlist"></button>
+   <a href="quick_view.php?pid=<?= $fetch_product['id']; ?>" class="fas fa-eye"></a>
+   <img src="uploaded_img/<?= $fetch_product['image_01']; ?>" alt="">
+   <div class="name"><?= $fetch_product['name']; ?></div>
+   <div class="flex">
+      <div class="price"><span>$</span><?= $fetch_product['price']; ?><span>/-</span></div>
+      <input type="number" name="qty" class="qty" min="1" max="99" value="1">
+   </div>
+   <!-- Add quantity display here -->
+   <div class="quantity">Available: <?= $fetch_product['quantity']; ?> pcs</div>
+   <input type="submit" value="add to cart" class="btn" name="add_to_cart">
+</form>
+<?php
    }
-   ?>
+} else {
+   echo '<p class="empty">no products found in this category!</p>';
+}
+?>
 
    </div>
 

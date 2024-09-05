@@ -25,10 +25,9 @@ if(isset($_GET['delete'])){
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>admin accounts</title>
+   <title>Admin Accounts</title>
 
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-
    <link rel="stylesheet" href="../css/admin_style.css">
 
 </head>
@@ -38,54 +37,48 @@ if(isset($_GET['delete'])){
 
 <section class="accounts">
 
-   <h1 class="heading">admin accounts</h1>
+   <h1 class="heading">Admin and Rider Accounts</h1>
 
    <div class="box-container">
 
-   <div class="box">
-      <p>add new admin</p>
-      <a href="register_admin.php" class="option-btn">register admin</a>
-   </div>
-
-   <?php
-      $select_accounts = $conn->prepare("SELECT * FROM `admins`");
-      $select_accounts->execute();
-      if($select_accounts->rowCount() > 0){
-         while($fetch_accounts = $select_accounts->fetch(PDO::FETCH_ASSOC)){   
-   ?>
-   <div class="box">
-      <p> admin id : <span><?= $fetch_accounts['id']; ?></span> </p>
-      <p> admin name : <span><?= $fetch_accounts['name']; ?></span> </p>
-      <div class="flex-btn">
-         <a href="admin_accounts.php?delete=<?= $fetch_accounts['id']; ?>" onclick="return confirm('delete this account?')" class="delete-btn">delete</a>
-         <?php
-            if($fetch_accounts['id'] == $admin_id){
-               echo '<a href="update_profile.php" class="option-btn">update</a>';
-            }
-         ?>
+      <div class="box">
+         <p>add new admin</p>
+         <a href="register_admin.php" class="option-btn">register admin</a>
       </div>
-   </div>
-   <?php
+
+      <div class="box">
+         <p>add new rider</p>
+         <a href="rider_register.php" class="option-btn">register rider</a>
+      </div>
+
+      <?php
+         $select_accounts = $conn->prepare("SELECT * FROM `admins`");
+         $select_accounts->execute();
+         if($select_accounts->rowCount() > 0){
+            while($fetch_accounts = $select_accounts->fetch(PDO::FETCH_ASSOC)){   
+      ?>
+      <div class="box">
+         <p> admin id : <span><?= $fetch_accounts['id']; ?></span> </p>
+         <p> admin name : <span><?= $fetch_accounts['name']; ?></span> </p>
+         <div class="flex-btn">
+            <a href="admin_accounts.php?delete=<?= $fetch_accounts['id']; ?>" onclick="return confirm('delete this account?')" class="delete-btn">delete</a>
+            <?php
+               if($fetch_accounts['id'] == $admin_id){
+                  echo '<a href="update_profile.php" class="option-btn">update</a>';
+               }
+            ?>
+         </div>
+      </div>
+      <?php
+            }
+         }else{
+            echo '<p class="empty">no accounts available!</p>';
          }
-      }else{
-         echo '<p class="empty">no accounts available!</p>';
-      }
-   ?>
+      ?>
 
    </div>
 
 </section>
-
-
-
-
-
-
-
-
-
-
-
 
 <script src="../js/admin_script.js"></script>
    

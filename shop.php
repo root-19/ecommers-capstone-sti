@@ -12,6 +12,20 @@ if(isset($_SESSION['user_id'])){
 
 include 'components/wishlist_cart.php';
 
+
+// Get the category from the URL
+$category = isset($_GET['category']) ? $_GET['category'] : '';
+
+// Prepare SQL query based on category
+if ($category) {
+    $select_products = $conn->prepare("SELECT * FROM `products` WHERE `category` = :category");
+    $select_products->bindParam(':category', $category);
+} else {
+    $select_products = $conn->prepare("SELECT * FROM `products`");
+}
+
+$select_products->execute();
+
 ?>
 
 <!DOCTYPE html>

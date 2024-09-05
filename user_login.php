@@ -13,26 +13,54 @@ if (isset($_SESSION['user_id'])) {
 if (isset($_POST['submit'])) {
     $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
     $pass = filter_var(sha1(trim($_POST['pass'])), FILTER_SANITIZE_STRING);
+    // $user_type = 'rider';
 
-    $select_user = $conn->prepare("SELECT * FROM `users` WHERE email = ? AND password = ?");
-    $select_user->execute([$email, $pass]);
-    $row = $select_user->fetch(PDO::FETCH_ASSOC);
-
-    if ($select_user->rowCount() > 0) {
-        $_SESSION['user_id'] = $row['id'];
-        // Check user type and redirect accordingly
-        if ($row['user_type'] === 'admin') {
-            header('Location: ../admin/admin_login.php');
+   
+    try {
+        $select_user = $conn->prepare("SELECT * FROM `users` WHERE email = ? AND password = ?");
+        $select_user->execute([$email, $pass]);
+        $row = $select_user->fetch(PDO::FETCH_ASSOC);
+    
+        if ($select_user->rowCount() > 0) {
+            // User exists in the database
+            $_SESSION['user_id'] = $row['id'];
+        
+            // Check the status of the user (e.g., if they are banned or not activated)
+            if ($row['status'] === 'banned') {
+                $message[] = 'Your account has been banned. Please contact support.';
+            } elseif ($row['status'] === 'pending') {
+                $message[] = 'Your account is not yet activated. Please check your email for the activation link.';
+            } else {
+                // Proceed based on user type
+                switch ($row['user_type']) {
+                    case 'admin':
+                        // Additional conditions for admin can go here
+                        header('Location: ../admin/dashboard.php');
+                        break;
+                    case 'rider':
+                        // Additional conditions for rider can go here
+                        header('Location: ../rider/rider_dashboard.php');
+                        break;
+                    default:
+                        // Default user (regular)
+                        header('Location: home.php');
+                        break;
+                }
+                exit();
+            }
         } else {
-            header('Location: home.php');
+            // User not found or incorrect email/password
+            $message[] = 'Incorrect email or password!';
         }
-        exit();
-    } else {
-        $message[] = 'Incorrect email or password!';
+        
+    } catch (PDOException $e) {
+        echo 'Database error: ' . $e->getMessage();
     }
-}
+}    
+
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
