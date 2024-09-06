@@ -256,53 +256,61 @@ tr:hover {
    <h1 class="heading">Products</h1>
 
    <div class="table-container">
-      <table>
-         <thead>
+    <table>
+        <thead>
             <tr>
-               <th>Image 01</th>
-               
-               <th>Name</th>
-               <th>Manufacturer</th>
-               <th>Type</th>
-               <th>Automobile Type</th>
-               <th>Price</th>
-               <th>Selling Price</th>
-               <th>Details</th>
-               <th>Category</th>
-               <th>Quantity</th>
-               <th>Actions</th>
+                <th>Image 01</th>
+                <th>Name</th>
+                <th>Manufacturer</th>
+                <th>Type</th>
+                <th>Automobile Type</th>
+                <th>Price</th>
+                <th>Selling Price</th>
+                <th>Details</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Actions</th>
             </tr>
-         </thead>
-         <tbody>
+        </thead>
+        <tbody>
             <?php
             $select_products = $conn->prepare("SELECT * FROM `products`");
             $select_products->execute();
             if($select_products->rowCount() > 0){
-               while($fetch_product = $select_products->fetch(PDO::FETCH_ASSOC)){ ?>
-                  <tr>
-                     <td><img src="../uploaded_img/<?php echo $fetch_product['image_01']; ?>" class="product-image" alt=""></td>
-                  
-                     <td><?php echo $fetch_product['name']; ?></td>
-                     <td><?php echo $fetch_product['manufacturer']; ?></td>
-                     <td><?php echo $fetch_product['type']; ?></td>
-                     <td><?php echo $fetch_product['automobile_type']; ?></td>
-                     <td><?php echo $fetch_product['price']; ?></td>
-                     <td><?php echo $fetch_product['selling_price']; ?></td>
-                     <td><?php echo $fetch_product['details']; ?></td>
-                     <td><?php echo $fetch_product['category']; ?></td>
-                     <td><?php echo $fetch_product['quantity']; ?></td>
-                     <td class="actions">
-                        <a href="update_product.php?edit=<?php echo $fetch_product['id']; ?>" class="option-btn">Update</a>
+                while($fetch_product = $select_products->fetch(PDO::FETCH_ASSOC)){ ?>
+                <tr>
+                    <td><img src="../uploaded_img/<?php echo htmlspecialchars($fetch_product['image_01']); ?>" class="product-image" alt=""></td>
+                    <td><?php echo htmlspecialchars($fetch_product['name']); ?></td>
+                    <td><?php echo htmlspecialchars($fetch_product['manufacturer']); ?></td>
+                    <td><?php echo htmlspecialchars($fetch_product['type']); ?></td>
+                    <td><?php echo htmlspecialchars($fetch_product['automobile_type']); ?></td>
+                    <td>&#8369;<?php echo htmlspecialchars($fetch_product['price']); ?></td>
+                    <td>&#8369;<?php echo htmlspecialchars($fetch_product['selling_price']); ?></td>
+                    <td><?php echo htmlspecialchars($fetch_product['details']); ?></td>
+                    <td><?php echo htmlspecialchars($fetch_product['category']); ?></td>
+                    
+                    <!-- Editable Quantity Form -->
+                    <td>
+                        <form action="update_product.php" method="POST">
+                            <input type="hidden" name="product_id" value="<?php echo $fetch_product['id']; ?>">
+                            <input type="number" name="new_quantity" value="<?php echo htmlspecialchars($fetch_product['quantity']); ?>" min="0">
+                            <button type="submit" class="option-btn">Update</button>
+                        </form>
+                    </td>
+
+                    <td class="actions">
                         <a href="products.php?delete=<?php echo $fetch_product['id']; ?>" class="delete-btn" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
-                     </td>
-                  </tr>
-               <?php }
+                    </td>
+                </tr>
+                <?php }
             } else {
-               echo '<tr><td colspan="13" class="empty">No products available</td></tr>';
+                echo '<tr><td colspan="13" class="empty">No products available</td></tr>';
             }
             ?>
-         </tbody>
-      </table>
+        </tbody>
+    </table>
+</div>
+
    </div>
 
 </section>

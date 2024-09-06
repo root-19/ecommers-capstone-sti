@@ -27,6 +27,7 @@ $low_stock_products = $check_quantity->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/admin_style.css">
 
     <script>
         function showAlert(message) {
