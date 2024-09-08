@@ -29,13 +29,13 @@ if(!isset($admin_id)){
 <style>
    .charts {
       display: flex;
-      flex-wrap: wrap; /* Allows wrapping if there are too many items */
-      justify-content: space-between; /* Evenly distributes space between charts */
+      flex-wrap: wrap; 
+      justify-content: space-between; 
    }
 
    .chart-container {
-      width: 30%; /* Each chart takes 30% of the row width */
-      height: 200px; /* Adjust the height of the charts */
+      width: 30%; 
+      height: 200px;
       margin: 20px 0;
       background-color: #fff;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -67,12 +67,12 @@ if(!isset($admin_id)){
 <div class="box">
    <?php
       $total_pendings = 0;
-      // Modify query to select 'product_quantities' instead of 'total_price'
+
       $select_pendings = $conn->prepare("SELECT * FROM `orders` WHERE status = ?");
       $select_pendings->execute(['pending']);
       if($select_pendings->rowCount() > 0){
          while($fetch_pendings = $select_pendings->fetch(PDO::FETCH_ASSOC)){
-            // Assuming 'product_quantities' is an integer or numeric value
+            
             $total_pendings += $fetch_pendings['product_quantities'];
          }
       }
@@ -87,12 +87,12 @@ if(!isset($admin_id)){
 <div class="box">
    <?php
       $total_completes = 0;
-      // Modify query to select 'product_quantities' instead of 'total_price'
+     
       $select_completes = $conn->prepare("SELECT * FROM `orders` WHERE payment_status = ?");
       $select_completes->execute(['completed']);
       if($select_completes->rowCount() > 0){
          while($fetch_completes = $select_completes->fetch(PDO::FETCH_ASSOC)){
-            // Summing up 'product_quantities' instead of 'total_price'
+           
             $total_completes += $fetch_completes['product_quantities'];
          }
       }
@@ -164,7 +164,7 @@ if(!isset($admin_id)){
 <div class="box">
    <?php
       $total_sold_products = 0;
-      // Query to sum 'product_quantities' for all completed orders
+      
       $select_sold_products = $conn->prepare("SELECT * FROM `orders` WHERE payment_status = ?");
       $select_sold_products->execute(['completed']);
       if($select_sold_products->rowCount() > 0){
@@ -182,7 +182,7 @@ if(!isset($admin_id)){
 <div class="box">
    <?php
       $total_sales_revenue = 0;
-      // Query to sum 'total_price' for all completed orders
+      
       $select_sales_revenue = $conn->prepare("SELECT * FROM `orders` WHERE payment_status = ?");
       $select_sales_revenue->execute(['completed']);
       if($select_sales_revenue->rowCount() > 0){

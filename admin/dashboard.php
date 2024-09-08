@@ -72,7 +72,7 @@ if(!isset($admin_id)){
       $select_pendings->execute(['pending']);
       if($select_pendings->rowCount() > 0){
          while($fetch_pendings = $select_pendings->fetch(PDO::FETCH_ASSOC)){
-            // Assuming 'product_quantities' is an integer or numeric value
+           
             $total_pendings += $fetch_pendings['product_quantities'];
          }
       }
@@ -87,12 +87,12 @@ if(!isset($admin_id)){
 <div class="box">
    <?php
       $total_completes = 0;
-      // Modify query to select 'product_quantities' instead of 'total_price'
+      
       $select_completes = $conn->prepare("SELECT * FROM `orders` WHERE payment_status = ?");
       $select_completes->execute(['completed']);
       if($select_completes->rowCount() > 0){
          while($fetch_completes = $select_completes->fetch(PDO::FETCH_ASSOC)){
-            // Summing up 'product_quantities' instead of 'total_price'
+         
             $total_completes += $fetch_completes['product_quantities'];
          }
       }
@@ -182,7 +182,7 @@ if(!isset($admin_id)){
 <div class="box">
    <?php
       $total_sales_revenue = 0;
-      // Query to sum 'total_price' for all completed orders
+      
       $select_sales_revenue = $conn->prepare("SELECT * FROM `orders` WHERE payment_status = ?");
       $select_sales_revenue->execute(['completed']);
       if($select_sales_revenue->rowCount() > 0){
