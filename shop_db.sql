@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 31, 2024 at 05:50 PM
+-- Generation Time: Sep 10, 2024 at 07:11 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -57,13 +57,6 @@ CREATE TABLE `cart` (
   `image` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `cart`
---
-
-INSERT INTO `cart` (`id`, `user_id`, `pid`, `name`, `price`, `quantity`, `image`) VALUES
-(4, 2, 1, 'Honda Civic Racing Exhaust', 1345, 1, 'home-img-1.png');
-
 -- --------------------------------------------------------
 
 --
@@ -86,26 +79,25 @@ CREATE TABLE `messages` (
 --
 
 CREATE TABLE `orders` (
-  `id` int(100) NOT NULL,
-  `user_id` int(100) NOT NULL,
-  `name` varchar(20) NOT NULL,
-  `number` varchar(10) NOT NULL,
-  `email` varchar(50) NOT NULL,
-  `method` varchar(50) NOT NULL,
-  `address` varchar(500) NOT NULL,
-  `total_products` varchar(1000) NOT NULL,
-  `total_price` int(100) NOT NULL,
-  `placed_on` date NOT NULL DEFAULT current_timestamp(),
-  `payment_status` varchar(20) NOT NULL DEFAULT 'pending'
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `method` varchar(255) NOT NULL,
+  `address` varchar(255) NOT NULL,
+  `product_names` text NOT NULL,
+  `product_quantities` text NOT NULL,
+  `total_price` decimal(10,2) NOT NULL,
+  `receipt_image` varchar(255) DEFAULT NULL,
+  `payment_status` enum('pending','completed') DEFAULT 'pending',
+  `placed_on` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `user_id`, `name`, `number`, `email`, `method`, `address`, `total_products`, `total_price`, `placed_on`, `payment_status`) VALUES
-(1, 1, 'karl', '0909090909', 'canedo1@gmail.com', 'cash on delivery', 'flat no. block 2, lot 7, taytay, rizal, philippines - 1920', 'Honda Civic Racing Exhaust (1345 x 2) - Akropovic (1111 x 1) - ', 3801, '2024-08-31', 'completed'),
-(2, 1, 'karl', '0909090909', 'canedo1@gmail.com', 'cash on delivery', 'flat no. block 2, lot 7, taytay, rizal, philippines - 1920', 'Akropovic (1111 x 2) - ', 2222, '2024-08-31', 'pending');
+INSERT INTO `orders` (`id`, `user_id`, `method`, `address`, `product_names`, `product_quantities`, `total_price`, `receipt_image`, `payment_status`, `placed_on`, `status`) VALUES
+(1, 4, 'gcash', 'No address provided', 'test', '1', 100.00, 'my-computer-version.png', 'completed', '2024-09-08 13:39:08', 'delivered');
 
 -- --------------------------------------------------------
 
@@ -114,22 +106,28 @@ INSERT INTO `orders` (`id`, `user_id`, `name`, `number`, `email`, `method`, `add
 --
 
 CREATE TABLE `products` (
-  `id` int(100) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `details` varchar(500) NOT NULL,
-  `price` int(10) NOT NULL,
-  `image_01` varchar(100) NOT NULL,
-  `image_02` varchar(100) NOT NULL,
-  `image_03` varchar(100) NOT NULL
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `manufacturer` varchar(255) NOT NULL,
+  `type` varchar(255) NOT NULL,
+  `automobile_type` varchar(255) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `selling_price` decimal(10,2) NOT NULL,
+  `details` text NOT NULL,
+  `image_01` varchar(255) NOT NULL,
+  `image_02` varchar(255) NOT NULL,
+  `image_03` varchar(255) NOT NULL,
+  `category` varchar(255) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `details`, `price`, `image_01`, `image_02`, `image_03`) VALUES
-(1, 'Honda Civic Racing Exhaust', 'Car Exhaust', 1345, 'home-img-1.png', 'home-img-1.png', 'home-img-1.png'),
-(2, 'Akropovic', 'Motorcycle Exhaust', 1111, 'home-img-3.png', 'home-img-3.png', 'home-img-3.png');
+INSERT INTO `products` (`id`, `name`, `manufacturer`, `type`, `automobile_type`, `price`, `selling_price`, `details`, `image_01`, `image_02`, `image_03`, `category`, `quantity`, `date`) VALUES
+(2, 'test', 'test', 'test', 'test', 100.00, 100.00, 'test', 'my-computer-version.png', 'my-computer-version.png', 'my-computer-version.png', 'Car Exhaust', 99, '2024-09-08');
 
 -- --------------------------------------------------------
 
@@ -138,19 +136,27 @@ INSERT INTO `products` (`id`, `name`, `details`, `price`, `image_01`, `image_02`
 --
 
 CREATE TABLE `users` (
-  `id` int(100) NOT NULL,
-  `name` varchar(20) NOT NULL,
-  `email` varchar(50) NOT NULL,
-  `password` varchar(50) NOT NULL
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `address` text NOT NULL,
+  `city` varchar(100) NOT NULL,
+  `country` varchar(100) NOT NULL,
+  `mobile` varchar(20) NOT NULL,
+  `pin_code` varchar(10) NOT NULL,
+  `user_type` enum('admin','user','rider') NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `password`) VALUES
-(1, 'curlyves', 'canedo1@gmail.com', '40bd001563085fc35165329ea1ff5c5ecbdbbeef'),
-(2, 'karl', 'asd123@gmail.com', '40bd001563085fc35165329ea1ff5c5ecbdbbeef');
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `address`, `city`, `country`, `mobile`, `pin_code`, `user_type`, `created_at`) VALUES
+(2, 'admin', 'wasieacuna@gmail.com', 'd9b3f01220869f2095809214fef10899f9b2234b', 'janlangpo', 'antipolo', 'Philippines', '09510608496', '1990', 'admin', '2024-09-08 13:09:46'),
+(3, 'admin', 'hperformanceexhaust@gmail.com', 'd033e22ae348aeb5660fc2140aec35850c4da997', 'janlangpo', 'antipolo', 'Philippines', '09510608496', '1990', 'user', '2024-09-08 13:14:26'),
+(4, 'rider', 'rider@gmail.com', 'bc7cafbd1f9bcb7a3065a603b98d5c45e60c67d9', '', '', '', '', '', 'rider', '2024-09-08 13:32:35');
 
 -- --------------------------------------------------------
 
@@ -193,7 +199,8 @@ ALTER TABLE `messages`
 -- Indexes for table `orders`
 --
 ALTER TABLE `orders`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `products`
@@ -205,7 +212,8 @@ ALTER TABLE `products`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- Indexes for table `wishlist`
@@ -227,7 +235,7 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `messages`
@@ -239,25 +247,35 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `wishlist`
 --
 ALTER TABLE `wishlist`
   MODIFY `id` int(100) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `orders`
+--
+ALTER TABLE `orders`
+  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
