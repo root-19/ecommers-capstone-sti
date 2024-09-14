@@ -10,17 +10,29 @@ if (!isset($_SESSION['user_id'])) {
 
 if (isset($_POST['update_delivery'])) {
     $order_id = $_POST['order_id'];
-    $update_delivery = $conn->prepare("UPDATE `orders` SET status = 'delivered' WHERE id = ?");
-    $update_delivery->execute([$order_id]);
-    $message[] = 'Order marked as delivered!';
+    $image = $_FILES['receipt_image'];
+
+    // Handle file upload
+    if ($image['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = '../uploads/';
+        $file_name = basename($image['name']);
+        $file_path = $upload_dir . $file_name;
+
+        if (move_uploaded_file($image['tmp_name'], $file_path)) {
+            // Update order with delivery status and receipt image path
+            $update_delivery = $conn->prepare("UPDATE `orders` SET status = 'delivered', receipt_image = ? WHERE id = ?");
+            $update_delivery->execute([$file_name, $order_id]);
+            $message[] = 'Order marked as delivered and receipt uploaded!';
+        } else {
+            $message[] = 'Failed to upload receipt image.';
+        }
+    } else {
+        $update_delivery = $conn->prepare("UPDATE `orders` SET status = 'delivered' WHERE id = ?");
+        $update_delivery->execute([$order_id]);
+        $message[] = 'Order marked as delivered!';
+    }
 }
 
-if (isset($_GET['delete'])) {
-    $delete_id = $_GET['delete'];
-    $delete_order = $conn->prepare("DELETE FROM `orders` WHERE id = ?");
-    $delete_order->execute([$delete_id]);
-    header('location:placed_orders.php');
-}
 ?>
 
 <!DOCTYPE html>
@@ -72,7 +84,7 @@ if (isset($_GET['delete'])) {
                     <th class="border px-4 py-2">Receipt</th>
                     <th class="border px-4 py-2">Payment Method</th>
                     <th class="border px-4 py-2">Delivered</th>
-                    <th class="border px-4 py-2">Actions</th>
+                    
                 </tr>
             </thead>
             <tbody>
@@ -105,15 +117,14 @@ if (isset($_GET['delete'])) {
                     </td>
                     <td class="border px-4 py-2"><?= $fetch_orders['method']; ?></td>
                     <td class="border px-4 py-2">
-                        <form action="" method="post" style="display: inline;">
+                        <form action="" method="post" enctype="multipart/form-data" style="display: inline;">
                             <input type="hidden" name="order_id" value="<?= $fetch_orders['id']; ?>">
+                            <input type="file" name="receipt_image">
                             <input type="checkbox" name="delivery_status" onchange="this.form.submit()" <?= $fetch_orders['status'] == 'delivered' ? 'checked' : ''; ?>>
                             <input type="hidden" name="update_delivery">
                         </form>
                     </td>
-                    <td class="border px-4 py-2">
-                        <a href="placed_orders.php?delete=<?= $fetch_orders['id']; ?>" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" onclick="return confirm('Delete this order?');">Delete</a>
-                    </td>
+                    <!-- Removed Delete Action -->
                 </tr>
                 <?php
                     }
@@ -129,4 +140,5 @@ if (isset($_GET['delete'])) {
 <script src="../js/admin_script.js"></script>
 </body>
 </html>
+
 

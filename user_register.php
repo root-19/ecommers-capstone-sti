@@ -17,9 +17,10 @@ if (isset($_POST['submit'])) {
     $pass = filter_var(trim($_POST['pass']), FILTER_SANITIZE_STRING);
     $cpass = filter_var(trim($_POST['cpass']), FILTER_SANITIZE_STRING);
 
-    $address = filter_var(trim($_POST['address']), FILTER_SANITIZE_STRING);
+    $house_number = filter_var(trim($_POST['house_number']), FILTER_SANITIZE_STRING);
+    $street = filter_var(trim($_POST['street']), FILTER_SANITIZE_STRING);
+    $subdivision = filter_var(trim($_POST['subdivision']), FILTER_SANITIZE_STRING);
     $city = filter_var(trim($_POST['city']), FILTER_SANITIZE_STRING);
-    $country = filter_var(trim($_POST['country']), FILTER_SANITIZE_STRING);
     $mobile = filter_var(trim($_POST['mobile']), FILTER_SANITIZE_STRING);
     $pin_code = filter_var(trim($_POST['pin_code']), FILTER_SANITIZE_STRING);
 
@@ -45,8 +46,8 @@ if (isset($_POST['submit'])) {
                 $user_type = 'user'; 
 
                 // Insert user into the database
-                $insert_user = $conn->prepare("INSERT INTO `users` (name, email, password, address, city, country, mobile, pin_code, user_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                if ($insert_user->execute([$name, $email, $hashed_pass, $address, $city, $country, $mobile, $pin_code, $user_type])) {
+                $insert_user = $conn->prepare("INSERT INTO `users` (name, email, password, house_number, street, subdivision, city, mobile, pin_code, user_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                if ($insert_user->execute([$name, $email, $hashed_pass, $house_number, $street, $subdivision, $city, $mobile, $pin_code, $user_type])) {
                     // Send OTP email
                     sendOTP($email);
                     header("Location: otp-verify.php"); 
@@ -112,17 +113,20 @@ function sendOTP($email) {
       <h3>Register Now</h3>
       <div class="form-row">
          <div class="form-column">
-            <input type="text" name="name" required placeholder="Enter your username" maxlength="20" class="box">
+            <input type="text" name="name" required placeholder="Enter your Fullname" maxlength="20" class="box">
             <input type="password" name="pass" required placeholder="Enter your password" maxlength="20" class="box">
-            <input type="text" name="address" required placeholder="Enter your address" maxlength="100" class="box">
-            <input type="text" name="country" required placeholder="Enter your country" maxlength="50" class="box">
-            <input type="text" name="pin_code" required placeholder="Enter your pin code" maxlength="10" class="box">
+            <input type="text" name="house_number" required placeholder="House Number" maxlength="10" class="box">
+            <input type="text" name="street" required placeholder="Street" maxlength="50" class="box">
+            <input type="text" name="subdivision" required placeholder="Subdivision" maxlength="50" class="box">
+            <input type="text" name="city" required placeholder="City" maxlength="50" class="box">
+            
          </div>
          <div class="form-column">
+            <input type="text" name="pin_code" required placeholder="Enter your pin code" maxlength="10" class="box">
             <input type="email" name="email" required placeholder="Enter your email" maxlength="50" class="box">
             <input type="password" name="cpass" required placeholder="Confirm your password" maxlength="20" class="box">
-            <input type="text" name="city" required placeholder="Enter your city" maxlength="50" class="box">
             <input type="text" name="mobile" required placeholder="Enter your mobile number" maxlength="15" class="box">
+            <input type="text" name="pin_code" required placeholder="Enter your pin code" maxlength="10" class="box">
          </div>
       </div>
       <input type="submit" value="Register Now" class="btn" name="submit">
@@ -130,7 +134,6 @@ function sendOTP($email) {
       <a href="user_login.php" class="option-btn">Login now</a>
    </form>
 </section>
-
 
 <?php include 'components/footer.php'; ?>
 

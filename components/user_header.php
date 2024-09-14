@@ -20,7 +20,8 @@
       <nav class="navbar">
          <a href="home.php">Home</a>
          <a href="about.php">About</a>
-         <!-- <a href="orders.php">Orders</a> -->
+         <a href="orders.php">Orders</a>
+         <!-- <a href="shop.php">Shop</a> -->
          <a href="shop.php">Shop</a>
          <a href="contact.php">Contact</a>
       </nav>
@@ -51,10 +52,10 @@
          ?>
          <p><?= $fetch_profile["name"]; ?></p>
          <a href="update_user.php" class="btn">Update Profile</a>
-         <div class="flex-btn">
+         <!-- <div class="flex-btn">
             <a href="user_register.php" class="option-btn">Register</a>
             <a href="user_login.php" class="option-btn">Login</a>
-         </div>
+         </div> -->
          <a href="components/user_logout.php" class="delete-btn" onclick="return confirm('logout from the website?');">Logout</a> 
          <?php
             }else{
