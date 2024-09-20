@@ -178,7 +178,39 @@ tr:hover {
 
 <?php include '../components/admin_header.php'; ?>
 
-<section class="add-products">
+<div class="pop-up">
+   <button id="addProductBtn">Add Product</button>
+   <button class="this-update" id="ProductBtn">update product</button>
+</div>
+
+<!-- Overlay for background dim effect -->
+<div class="overlay" id="overlay"></div>
+
+<!-- Pop-up Form for Searching and Updating -->
+<section class="add-products" id="updateProductForm">
+    <h1 class="heading">Update Product Quantity</h1>
+
+    <!-- Search bar to find products -->
+    <div class="inputBox">
+        <span>Search Product by Name</span>
+        <input type="text" id="productSearch" class="box" placeholder="Enter product name" oninput="searchProduct(this.value)">
+    </div>
+
+    <!-- Search suggestions will be displayed here -->
+    <div id="searchResults" class="search-results"></div>
+
+    <!-- Quantity Update Form -->
+    <form id="updateQuantityForm" action="update_product.php" method="POST">
+        <input type="hidden" name="product_id" id="product_id">
+        <div class="inputBox">
+            <span>New Quantity</span>
+            <input type="number" name="new_quantity" id="new_quantity" class="box" min="1" required placeholder="Enter new quantity">
+        </div>
+        <input type="submit" value="Update Quantity" class="btn">
+    </form>
+</section>
+
+<section class="add-products" id="addProductForm">
    <h1 class="heading">Add Product</h1>
 
    <form action="" method="post" enctype="multipart/form-data">
@@ -212,27 +244,23 @@ tr:hover {
             <textarea name="details" class="box" placeholder="Enter product details" required></textarea>
          </div>
          <div class="inputBox">
-    <span>Date (required)</span>
-    <input type="date" class="box" required name="date">
-</div>
-
+            <span>Date (required)</span>
+            <input type="date" class="box" required name="date">
+         </div>
          <div class="inputBox">
-            <span>category (required)</span>
+            <span>Category (required)</span>
             <select name="category" class="box" required>
-               <option value="" disabled selected>choose category</option>
+               <option value="" disabled selected>Choose category</option>
                <option value="Car Exhaust">Car Exhaust</option>
                <option value="Motorcycle Exhaust">Motorcycle Exhaust</option>
                <option value="Exhaust Auxiliaries">Exhaust Auxiliaries</option>
                <option value="Air Filter">Air Filter</option>
             </select>
          </div>
-      </div>
-
          <div class="inputBox">
-    <span>Quantity (required)</span>
-    <input type="number" class="box" required placeholder="Enter quantity" name="quantity">
-</div>
-
+            <span>Quantity (required)</span>
+            <input type="number" class="box" required placeholder="Enter quantity" name="quantity">
+         </div>
          <div class="inputBox">
             <span>Image 01 (required)</span>
             <input type="file" class="box" accept="image/*" name="image_01" required>
@@ -248,7 +276,6 @@ tr:hover {
       </div>
       <input type="submit" value="Add Product" class="btn" name="add_product">
    </form>
-
 </section>
 
 <section class="show-products">
@@ -288,15 +315,17 @@ tr:hover {
                     <td>&#8369;<?php echo htmlspecialchars($fetch_product['selling_price']); ?></td>
                     <td><?php echo htmlspecialchars($fetch_product['details']); ?></td>
                     <td><?php echo htmlspecialchars($fetch_product['category']); ?></td>
+                    <td><?php echo htmlspecialchars($fetch_product['quantity']); ?></td>
+
                     
                     <!-- Editable Quantity Form -->
-                    <td>
+                    <!-- <td>
                         <form action="update_product.php" method="POST">
                             <input type="hidden" name="product_id" value="<?php echo $fetch_product['id']; ?>">
                             <input type="number" name="new_quantity" value="<?php echo htmlspecialchars($fetch_product['quantity']); ?>" min="0">
                             <button type="submit" class="option-btn">Update</button>
                         </form>
-                    </td>
+                    </td> -->
 
                     <td class="actions">
                         <a href="products.php?delete=<?php echo $fetch_product['id']; ?>" class="delete-btn" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
@@ -314,6 +343,62 @@ tr:hover {
    </div>
 
 </section>
+<script>
+   // Get the button and form elements
+   const addProductBtn = document.getElementById('addProductBtn');
+   const addProductForm = document.getElementById('addProductForm');
+   const overlay = document.getElementById('overlay');
 
+   // Show the form when the button is clicked
+   addProductBtn.addEventListener('click', function() {
+      addProductForm.classList.add('active');
+      overlay.classList.add('active');
+   });
+
+   // Hide the form when the overlay is clicked
+   overlay.addEventListener('click', function() {
+      addProductForm.classList.remove('active');
+      overlay.classList.remove('active');
+   });
+
+   // Show pop-up on button click
+document.getElementById('ProductBtn').addEventListener('click', function() {
+    document.getElementById('updateProductForm').classList.add('active');
+    document.getElementById('overlay').classList.add('active');
+});
+
+// Hide pop-up when clicking outside the form
+document.getElementById('overlay').addEventListener('click', function() {
+    document.getElementById('updateProductForm').classList.remove('active');
+    document.getElementById('overlay').classList.remove('active');
+});
+
+// Function to search for products as the user types
+function searchProduct(query) {
+    if (query.length === 0) {
+        document.getElementById('searchResults').innerHTML = '';
+        return;
+    }
+
+    // AJAX to fetch product suggestions
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', 'search_product.php?query=' + encodeURIComponent(query), true);
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            document.getElementById('searchResults').innerHTML = xhr.responseText;
+        }
+    };
+    xhr.send();
+}
+
+// Function to fill the form when a product is selected
+function selectProduct(id, name, quantity) {
+    document.getElementById('product_id').value = id;
+    document.getElementById('new_quantity').value = quantity;
+    document.getElementById('productSearch').value = name;
+    document.getElementById('searchResults').innerHTML = '';
+}
+
+</script>
 </body>
 </html>

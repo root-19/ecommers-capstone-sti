@@ -10,6 +10,7 @@ if(!isset($admin_id)){
    header('location:admin_login.php');
 }
 
+
 ?>
 
 <!DOCTYPE html>
@@ -26,27 +27,7 @@ if(!isset($admin_id)){
 
 </head>
 <body>
-<style>
-   .charts {
-      display: flex;
-      flex-wrap: wrap; /* Allows wrapping if there are too many items */
-      justify-content: space-between; /* Evenly distributes space between charts */
-   }
 
-   .chart-container {
-      width: 30%; /* Each chart takes 30% of the row width */
-      height: 200px; /* Adjust the height of the charts */
-      margin: 20px 0;
-      background-color: #fff;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      border-radius: 5px;
-   }
-
-   canvas {
-      width: 100% !important;
-      height: 100% !important;
-   }
-</style>
 
 
 <?php include '../components/admin_header.php'; ?>
@@ -64,24 +45,24 @@ if(!isset($admin_id)){
       </div>
 
     <!-- Total Pending Orders -->
+   <!-- Total Pending Orders -->
 <div class="box">
    <?php
-      $total_pendings = 0;
-      // Modify query to select 'product_quantities' instead of 'total_price'
-      $select_pendings = $conn->prepare("SELECT * FROM `orders` WHERE status = ?");
+      $total_pendings = 0; // Initialize the count to 0
+
+      // Prepare the query to count the number of pending orders
+      $select_pendings = $conn->prepare("SELECT COUNT(*) AS pending_count FROM `orders` WHERE payment_status = ?");
       $select_pendings->execute(['pending']);
-      if($select_pendings->rowCount() > 0){
-         while($fetch_pendings = $select_pendings->fetch(PDO::FETCH_ASSOC)){
-           
-            $total_pendings += $fetch_pendings['product_quantities'];
-         }
+      $result = $select_pendings->fetch(PDO::FETCH_ASSOC);
+
+      if ($result) {
+         $total_pendings = $result['pending_count']; // Set the count of pending orders
       }
    ?>
    <h3><?= $total_pendings; ?></h3>
-   <p>total order pendings</p>
-   <a href="placed_orders.php" class="btn">see orders</a>
+   <p>Total Pending Orders</p>
+   <a href="placed_orders.php" class="btn">See Orders</a>
 </div>
-
 
     <!-- Completed Orders -->
 <div class="box">
@@ -199,223 +180,3 @@ if(!isset($admin_id)){
    </div>
 
 </section>
-
-<!-- Charts Section -->
-<h2 class="heading">Sales Analytics</h2>
-<section class="charts">
-   
-
-   <div class="chart-container">
-      <canvas id="pendingOrdersChart"></canvas>
-   </div>
-
-   <div class="chart-container">
-      <canvas id="completedOrdersChart"></canvas>
-   </div>
-
-   <div class="chart-container">
-      <canvas id="totalOrdersChart"></canvas>
-   </div>
-
-   <div class="chart-container">
-      <canvas id="productsAddedChart"></canvas>
-   </div>
-
-   <div class="chart-container">
-      <canvas id="normalUsersChart"></canvas>
-   </div>
-
-   <div class="chart-container">
-      <canvas id="adminUsersChart"></canvas>
-   </div>
-
-   <div class="chart-container">
-      <canvas id="newMessagesChart"></canvas>
-   </div>
-</section>
-
-
-<script src="../js/admin_script.js"></script>
-
-<script>
- document.addEventListener('DOMContentLoaded', function() {
-    fetch('fetch_data_sales.php')
-    .then(response => response.json())
-        .then(data => {
-            if (!data) {
-                console.error('No data received');
-                return;
-            }
-
-            const {
-                total_pendings,
-                total_completes,
-                number_of_orders,
-                number_of_products,
-                number_of_users,
-                number_of_admins,
-                number_of_messages
-            } = data;
-
-            // Chart for Total Order Pendings
-            new Chart(document.getElementById('pendingOrdersChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Total Order Pendings'],
-                    datasets: [{
-                        label: 'Amount',
-                        data: [total_pendings],
-                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // Chart for Completed Orders
-            new Chart(document.getElementById('completedOrdersChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Total Completed Orders'],
-                    datasets: [{
-                        label: 'Amount',
-                        data: [total_completes],
-                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // Chart for Total Orders Placed
-            new Chart(document.getElementById('totalOrdersChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Total Orders Placed'],
-                    datasets: [{
-                        label: 'Count',
-                        data: [number_of_orders],
-                        backgroundColor: 'rgba(153, 102, 255, 0.5)',
-                        borderColor: 'rgba(153, 102, 255, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // Chart for Products Added
-            new Chart(document.getElementById('productsAddedChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Products Added'],
-                    datasets: [{
-                        label: 'Count',
-                        data: [number_of_products],
-                        backgroundColor: 'rgba(255, 159, 64, 0.5)',
-                        borderColor: 'rgba(255, 159, 64, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // Chart for Normal Users
-            new Chart(document.getElementById('normalUsersChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Normal Users'],
-                    datasets: [{
-                        label: 'Count',
-                        data: [number_of_users],
-                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // Chart for Admin Users
-            new Chart(document.getElementById('adminUsersChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Admin Users'],
-                    datasets: [{
-                        label: 'Count',
-                        data: [number_of_admins],
-                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // Chart for New Messages
-            new Chart(document.getElementById('newMessagesChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['New Messages'],
-                    datasets: [{
-                        label: 'Count',
-                        data: [number_of_messages],
-                        backgroundColor: 'rgba(255, 205, 86, 0.5)',
-                        borderColor: 'rgba(255, 205, 86, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-        })
-        .catch(error => console.error('Error fetching data:', error));
-});
-</script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-</body>
-</html>
