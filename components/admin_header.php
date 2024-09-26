@@ -23,6 +23,7 @@
          <a href="../admin/admin_accounts.php">Admins</a>
          <a href="../admin/users_accounts.php">Users</a>
          <a href="../admin/messages.php">Messages</a>
+         <a href="../admin/archive.php">Archieve</a>
          <a href="../admin/analytics.php">Analytics</a>
          <a href="../admin/inventory_alert.php">alerts</a>
          <a href="../admin/notif_status.php">rider</a>

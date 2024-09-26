@@ -4,28 +4,57 @@ include '../components/connect.php';
 
 session_start();
 
-$admin_id = $_SESSION['admin_id'];
+$admin_id = $_SESSION['id'];
 
-if(!isset($admin_id)){
-   header('location:admin_login.php');
+if (!isset($admin_id)) {
+    header('location:admin_login.php');
 }
 
-if(isset($_GET['delete'])){
-   $delete_id = $_GET['delete'];
-   $delete_user = $conn->prepare("DELETE FROM `users` WHERE id = ?");
-   $delete_user->execute([$delete_id]);
-   $delete_orders = $conn->prepare("DELETE FROM `orders` WHERE user_id = ?");
-   $delete_orders->execute([$delete_id]);
-   $delete_messages = $conn->prepare("DELETE FROM `messages` WHERE user_id = ?");
-   $delete_messages->execute([$delete_id]);
-   $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
-   $delete_cart->execute([$delete_id]);
-   $delete_wishlist = $conn->prepare("DELETE FROM `wishlist` WHERE user_id = ?");
-   $delete_wishlist->execute([$delete_id]);
-   header('location:users_accounts.php');
+if (isset($_GET['delete'])) {
+    $delete_id = $_GET['delete'];
+
+    // Fetch user data
+    $select_user = $conn->prepare("SELECT * FROM `users` WHERE id = ?");
+    $select_user->execute([$delete_id]);
+    $user_data = $select_user->fetch(PDO::FETCH_ASSOC);
+
+    if ($user_data) { // Check if user exists
+        // Archive user data
+        $archive_user = $conn->prepare("INSERT INTO `archived_users` (user_id, name, email) VALUES (?, ?, ?)");
+        $archive_user->execute([$user_data['id'], $user_data['name'], $user_data['email']]);
+
+        // Delete related data in the correct order
+        // Start with orders
+        $delete_orders = $conn->prepare("DELETE FROM `orders` WHERE user_id = ?");
+        $delete_orders->execute([$delete_id]);
+
+        // Then messages
+        $delete_messages = $conn->prepare("DELETE FROM `messages` WHERE user_id = ?");
+        $delete_messages->execute([$delete_id]);
+
+        // Then cart
+        $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
+        $delete_cart->execute([$delete_id]);
+
+        // Then wishlist
+        $delete_wishlist = $conn->prepare("DELETE FROM `wishlist` WHERE user_id = ?");
+        $delete_wishlist->execute([$delete_id]);
+
+        // Finally, delete the user from the main users table
+        $delete_user = $conn->prepare("DELETE FROM `users` WHERE id = ?");
+        $delete_user->execute([$delete_id]);
+
+        // Redirect after deletion
+        header('location:users_accounts.php');
+        exit(); // Ensure no further code is executed after redirect
+    } else {
+        echo "User not found.";
+    }
 }
 
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">

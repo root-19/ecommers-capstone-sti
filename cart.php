@@ -4,8 +4,8 @@ include 'components/connect.php';
 
 session_start();
 
-if(isset($_SESSION['user_id'])){
-   $user_id = $_SESSION['user_id'];
+if(isset($_SESSION['id'])){
+   $user_id = $_SESSION['id'];
 }else{
    $user_id = '';
    header('location:user_login.php');
@@ -66,6 +66,7 @@ if(isset($_POST['update_qty'])){
                 <table class="table table-bordered text-center">
                     <thead class="table-dark">
                         <tr>
+                            <th scope="col">ID</th> 
                             <th scope="col">Image</th>
                             <th scope="col">Product Name</th>
                             <th scope="col">Price</th>
@@ -84,8 +85,11 @@ if(isset($_POST['update_qty'])){
                             while ($fetch_cart = $select_cart->fetch(PDO::FETCH_ASSOC)) {
                         ?>
                                 <tr>
+                                <td><?= $fetch_cart['id']; ?></td>
                                     <td>
+                                    
                                         <a href="quick_view.php?pid=<?= $fetch_cart['pid']; ?>" class="fas fa-eye"></a>
+                                       
                                         <img src="uploaded_img/<?= $fetch_cart['image']; ?>" alt="" class="img-thumbnail" style="width: 100px; height: 100px;">
                                     </td>
                                     <td><?= $fetch_cart['name']; ?></td>

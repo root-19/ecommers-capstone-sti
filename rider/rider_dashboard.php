@@ -3,7 +3,7 @@ include '../components/connect.php';
 session_start();
 
 // Check if the user is logged in and is a rider
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['id'])) {
     header('Location: ../user_login.php');
     exit();
 }
@@ -32,6 +32,19 @@ if (isset($_POST['update_delivery'])) {
         $message[] = 'Order marked as delivered!';
     }
 }
+
+if (isset($_POST['send_data'])) {
+    $order_id = $_POST['order_id'];
+
+    // Mark the canceled order for delivery in the orders table
+    $update_order = $conn->prepare("UPDATE `canceled_orders` SET status = 'for_delivery' WHERE id = ?");
+    if ($update_order->execute([$order_id])) {
+        $message[] = 'Order is now marked for delivery!';
+    } else {
+        $message[] = 'Failed to update order status.';
+    }
+}
+
 
 ?>
 
@@ -75,6 +88,7 @@ if (isset($_POST['update_delivery'])) {
         <table class="min-w-full bg-white">
             <thead>
                 <tr>
+                    <th class="border px-4 py92">ID</th>
                     <th class="border px-4 py-2">Placed On</th>
                     <th class="border px-4 py-2">Name</th>
                     <th class="border px-4 py-2">Number</th>
@@ -100,6 +114,7 @@ if (isset($_POST['update_delivery'])) {
                     while ($fetch_orders = $select_pending_orders->fetch(PDO::FETCH_ASSOC)) {
                 ?>
                 <tr class="hover:bg-gray-100">
+                    
                     <td class="border px-4 py-2"><?= $fetch_orders['placed_on']; ?></td>
                     <td class="border px-4 py-2"><?= $fetch_orders['name']; ?></td>
                     <td class="border px-4 py-2"><?= $fetch_orders['mobile']; ?></td>
@@ -135,6 +150,51 @@ if (isset($_POST['update_delivery'])) {
             </tbody>
         </table>
     </div>
+
+    <h3 class="heading">Canceled Orders</h3>
+
+<div class="table-container">
+    <table class="min-w-full bg-white">
+        <thead>
+            <tr>
+                <th class="border px-4 py-2">Order ID</th>
+                <th class="border px-4 py-2">User ID</th>
+                <th class="border px-4 py-2">Product Quantities</th>
+                <th class="border px-4 py-2">Total Price</th>
+                <th class="border px-4 py-2">Payment Method</th>
+                <th class="border px-4 py-2">Canceled At</th>
+               
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            $select_canceled_orders = $conn->prepare("SELECT * FROM `canceled_orders`");
+            $select_canceled_orders->execute();
+            if ($select_canceled_orders->rowCount() > 0) {
+                while ($fetch_canceled_order = $select_canceled_orders->fetch(PDO::FETCH_ASSOC)) { ?>
+                    <tr>
+                        <td class="border px-4 py-2"><?php echo htmlspecialchars($fetch_canceled_order['id']); ?></td>
+                        <td class="border px-4 py-2"><?php echo htmlspecialchars($fetch_canceled_order['user_id']); ?></td>
+                        <td class="border px-4 py-2"><?php echo htmlspecialchars($fetch_canceled_order['product_quantities']); ?></td>
+                        <td class="border px-4 py-2">&#8369;<?php echo htmlspecialchars($fetch_canceled_order['total_price']); ?></td>
+                        <td class="border px-4 py-2"><?php echo htmlspecialchars($fetch_canceled_order['method']); ?></td>
+                        <td class="border px-4 py-2"><?php echo htmlspecialchars($fetch_canceled_order['deleted_at']); ?></td>
+                        <td class="border px-4 py-2">
+                    
+                                <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($fetch_canceled_order['id']); ?>">
+\
+                        </td>
+                    </tr>
+                <?php }
+            } else { ?>
+                <tr>
+                    <td colspan="7" class="text-center p-4">No canceled orders found.</td>
+                </tr>
+            <?php } ?>
+        </tbody>
+    </table>
+</div>
+
 </section>
 
 <script src="../js/admin_script.js"></script>

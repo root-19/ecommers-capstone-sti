@@ -4,8 +4,8 @@ include 'components/connect.php';
 
 session_start();
 
-if (isset($_SESSION['user_id'])) {
-    $user_id = $_SESSION['user_id'];
+if (isset($_SESSION['id'])) {
+    $user_id = $_SESSION['id'];
 } else {
     $user_id = '';
 }
@@ -23,7 +23,7 @@ if (isset($_POST['submit'])) {
     
         if ($select_user->rowCount() > 0) {
             // User exists in the database
-            $_SESSION['user_id'] = $row['id'];
+            $_SESSION['id'] = $row['id'];
         
             // Check the status of the user (e.g., if they are banned or not activated)
             if ($row['status'] === 'banned') {

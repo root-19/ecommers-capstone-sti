@@ -64,7 +64,6 @@ if(!isset($admin_id)){
    <a href="placed_orders.php" class="btn">See Orders</a>
 </div>
 
-    <!-- Completed Orders -->
 <div class="box">
    <?php
       $total_completes = 0;
@@ -73,11 +72,15 @@ if(!isset($admin_id)){
       $select_completes->execute(['completed']);
       if($select_completes->rowCount() > 0){
          while($fetch_completes = $select_completes->fetch(PDO::FETCH_ASSOC)){
-         
-            $total_completes += $fetch_completes['product_quantities'];
+            // Ensure product_quantities is numeric
+            if(is_numeric($fetch_completes['product_quantities'])){
+               $total_completes += (int)$fetch_completes['product_quantities']; // Cast to int to avoid warnings
+            }
          }
       }
    ?>
+
+
    <h3><?= $total_completes; ?></h3>
    <p>completed orders</p>
    <a href="placed_orders.php" class="btn">see orders</a>
@@ -143,17 +146,22 @@ if(!isset($admin_id)){
       </div>
    <!-- Total Sold Products -->
 <div class="box">
-   <?php
-      $total_sold_products = 0;
-      // Query to sum 'product_quantities' for all completed orders
-      $select_sold_products = $conn->prepare("SELECT * FROM `orders` WHERE payment_status = ?");
-      $select_sold_products->execute(['completed']);
-      if($select_sold_products->rowCount() > 0){
-         while($fetch_sold_products = $select_sold_products->fetch(PDO::FETCH_ASSOC)){
-            $total_sold_products += $fetch_sold_products['product_quantities'];
-         }
-      }
-   ?>
+<?php
+   $total_sold_products = 0;
+   
+   // Optimized query to directly sum 'product_quantities' for completed orders
+   $select_sold_products = $conn->prepare("SELECT SUM(product_quantities) AS total_quantities FROM `orders` WHERE payment_status = ?");
+   $select_sold_products->execute(['completed']);
+   
+   // Fetch the result
+   $result = $select_sold_products->fetch(PDO::FETCH_ASSOC);
+   
+   // Check if the result contains a valid total and assign it
+   if ($result && is_numeric($result['total_quantities'])) {
+      $total_sold_products = (int)$result['total_quantities'];
+   }
+?>
+   
    <h3><?= $total_sold_products; ?></h3>
    <p>total sold products</p>
    <a href="placed_orders.php" class="btn">see orders</a>

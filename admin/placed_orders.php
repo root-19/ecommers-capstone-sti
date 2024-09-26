@@ -101,6 +101,7 @@ if (isset($_GET['delete'])) {
         <table>
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th>Placed On</th>
                     <th>Name</th>
                     <th>Number</th>
@@ -126,6 +127,7 @@ if (isset($_GET['delete'])) {
                     while ($fetch_orders = $select_pending_orders->fetch(PDO::FETCH_ASSOC)) {
                 ?>
                 <tr>
+                    <td><?=$fetch_orders['id'];?></td>
                     <td><?= $fetch_orders['placed_on']; ?></td>
                     <td><?= $fetch_orders['name']; ?></td>
                     <td><?= $fetch_orders['mobile']; ?></td>
@@ -171,7 +173,7 @@ if (isset($_GET['delete'])) {
     <div class="table-container">
         <table>
             <thead>
-                <tr>
+                <tr> <th>ID</th>
                     <th>Placed On</th>
                     <th>Name</th>
                     <th>Number</th>
@@ -197,6 +199,7 @@ if (isset($_GET['delete'])) {
                     while ($fetch_orders = $select_completed_orders->fetch(PDO::FETCH_ASSOC)) {
                 ?>
                 <tr>
+                    <th><?= $fetch_orders['id'];?></th>
                     <td><?= $fetch_orders['placed_on']; ?></td>
                     <td><?= $fetch_orders['name']; ?></td>
                     <td><?= $fetch_orders['mobile']; ?></td>

@@ -73,6 +73,7 @@ $select_notifications->execute();
     <table>
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Placed On</th>
                 <th>Name</th>
                 <th>Number</th>
@@ -89,6 +90,7 @@ $select_notifications->execute();
                 while ($fetch_notification = $select_notifications->fetch(PDO::FETCH_ASSOC)) {
             ?>
             <tr>
+                <td><?= $fetch_notification['id']; ?></td>
                 <td><?= htmlspecialchars($fetch_notification['placed_on']); ?></td>
                 <td><?= htmlspecialchars($fetch_notification['user_name']); ?></td>
                 <td><?= htmlspecialchars($fetch_notification['user_number']); ?></td>

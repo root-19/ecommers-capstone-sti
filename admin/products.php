@@ -6,83 +6,119 @@ session_start();
 
 $admin_id = $_SESSION['admin_id'];
 
-if(!isset($admin_id)){
-   header('location:admin_login.php');
-   exit();
+if (!isset($admin_id)) {
+    header('location:admin_login.php');
+    exit();
 }
 
-if(isset($_POST['add_product'])) {
+if (isset($_POST['add_product'])) {
 
-   // Check if the required POST variables are set
-   $name = isset($_POST['name']) ? filter_var($_POST['name'], FILTER_SANITIZE_STRING) : '';
-   $manufacturer = isset($_POST['manufacturer']) ? filter_var($_POST['manufacturer'], FILTER_SANITIZE_STRING) : '';
-   $type = isset($_POST['type']) ? filter_var($_POST['type'], FILTER_SANITIZE_STRING) : '';
-   $automobile_type = isset($_POST['automobile_type']) ? filter_var($_POST['automobile_type'], FILTER_SANITIZE_STRING) : '';
-   $price = isset($_POST['price']) ? filter_var($_POST['price'], FILTER_SANITIZE_STRING) : '';
-   $selling_price = isset($_POST['selling_price']) ? filter_var($_POST['selling_price'], FILTER_SANITIZE_STRING) : '';
-   $details = isset($_POST['details']) ? filter_var($_POST['details'], FILTER_SANITIZE_STRING) : '';
-   $category = isset($_POST['category']) ? filter_var($_POST['category'], FILTER_SANITIZE_STRING) : '';
-   $quantity = isset($_POST['quantity']) ? filter_var($_POST['quantity'], FILTER_SANITIZE_NUMBER_INT) : '';
-   $date = isset($_POST['date']) ? filter_var($_POST['date'], FILTER_SANITIZE_STRING) : '';
+    // Check if the required POST variables are set
+    $name = isset($_POST['name']) ? filter_var($_POST['name'], FILTER_SANITIZE_STRING) : '';
+    $manufacturer = isset($_POST['manufacturer']) ? filter_var($_POST['manufacturer'], FILTER_SANITIZE_STRING) : '';
+    $type = isset($_POST['type']) ? filter_var($_POST['type'], FILTER_SANITIZE_STRING) : '';
+    $automobile_type = isset($_POST['automobile_type']) ? filter_var($_POST['automobile_type'], FILTER_SANITIZE_STRING) : '';
+    $price = isset($_POST['price']) ? filter_var($_POST['price'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION) : '';
+    $selling_price = isset($_POST['selling_price']) ? filter_var($_POST['selling_price'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION) : '';
+    $details = isset($_POST['details']) ? filter_var($_POST['details'], FILTER_SANITIZE_STRING) : '';
+    $category = isset($_POST['category']) ? filter_var($_POST['category'], FILTER_SANITIZE_STRING) : '';
+    $quantity = isset($_POST['quantity']) ? filter_var($_POST['quantity'], FILTER_SANITIZE_NUMBER_INT) : '';
+    $date = isset($_POST['date']) ? filter_var($_POST['date'], FILTER_SANITIZE_STRING) : '';
 
+    // Handle file uploads
+    $image_01 = isset($_FILES['image_01']['name']) ? filter_var($_FILES['image_01']['name'], FILTER_SANITIZE_STRING) : '';
+    $image_size_01 = isset($_FILES['image_01']['size']) ? $_FILES['image_01']['size'] : 0;
+    $image_tmp_name_01 = isset($_FILES['image_01']['tmp_name']) ? $_FILES['image_01']['tmp_name'] : '';
+    $image_folder_01 = '../uploaded_img/' . $image_01;
 
+    $image_02 = isset($_FILES['image_02']['name']) ? filter_var($_FILES['image_02']['name'], FILTER_SANITIZE_STRING) : '';
+    $image_size_02 = isset($_FILES['image_02']['size']) ? $_FILES['image_02']['size'] : 0;
+    $image_tmp_name_02 = isset($_FILES['image_02']['tmp_name']) ? $_FILES['image_02']['tmp_name'] : '';
+    $image_folder_02 = '../uploaded_img/' . $image_02;
 
-   // Handle file uploads
-   $image_01 = isset($_FILES['image_01']['name']) ? filter_var($_FILES['image_01']['name'], FILTER_SANITIZE_STRING) : '';
-   $image_size_01 = isset($_FILES['image_01']['size']) ? $_FILES['image_01']['size'] : 0;
-   $image_tmp_name_01 = isset($_FILES['image_01']['tmp_name']) ? $_FILES['image_01']['tmp_name'] : '';
-   $image_folder_01 = '../uploaded_img/'.$image_01;
+    $image_03 = isset($_FILES['image_03']['name']) ? filter_var($_FILES['image_03']['name'], FILTER_SANITIZE_STRING) : '';
+    $image_size_03 = isset($_FILES['image_03']['size']) ? $_FILES['image_03']['size'] : 0;
+    $image_tmp_name_03 = isset($_FILES['image_03']['tmp_name']) ? $_FILES['image_03']['tmp_name'] : '';
+    $image_folder_03 = '../uploaded_img/' . $image_03;
 
-   $image_02 = isset($_FILES['image_02']['name']) ? filter_var($_FILES['image_02']['name'], FILTER_SANITIZE_STRING) : '';
-   $image_size_02 = isset($_FILES['image_02']['size']) ? $_FILES['image_02']['size'] : 0;
-   $image_tmp_name_02 = isset($_FILES['image_02']['tmp_name']) ? $_FILES['image_02']['tmp_name'] : '';
-   $image_folder_02 = '../uploaded_img/'.$image_02;
+    // Check if product already exists
+    $select_products = $conn->prepare("SELECT * FROM `products` WHERE name = ?");
+    $select_products->execute([$name]);
 
-   $image_03 = isset($_FILES['image_03']['name']) ? filter_var($_FILES['image_03']['name'], FILTER_SANITIZE_STRING) : '';
-   $image_size_03 = isset($_FILES['image_03']['size']) ? $_FILES['image_03']['size'] : 0;
-   $image_tmp_name_03 = isset($_FILES['image_03']['tmp_name']) ? $_FILES['image_03']['tmp_name'] : '';
-   $image_folder_03 = '../uploaded_img/'.$image_03;
-
-   $select_products = $conn->prepare("SELECT * FROM `products` WHERE name = ?");
-   $select_products->execute([$name]);
-
-   if($select_products->rowCount() > 0){
-      $message[] = 'Product name already exists!';
-   } else {
-      $insert_products = $conn->prepare("INSERT INTO `products`(name, manufacturer, type, automobile_type, price, selling_price, details, image_01, image_02, image_03, category, quantity, date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)");
-$insert_products->execute([$name, $manufacturer, $type, $automobile_type, $price, $selling_price, $details, $image_01, $image_02, $image_03, $category, $quantity, $date]);
-
-      if($insert_products){
-         if($image_size_01 > 2000000 OR $image_size_02 > 2000000 OR $image_size_03 > 2000000){
+    if ($select_products->rowCount() > 0) {
+        $message[] = 'Product name already exists!';
+    } else {
+        // Check image sizes before proceeding
+        if ($image_size_01 > 2000000 || $image_size_02 > 2000000 || $image_size_03 > 2000000) {
             $message[] = 'Image size is too large!';
-         } else {
-            move_uploaded_file($image_tmp_name_01, $image_folder_01);
-            move_uploaded_file($image_tmp_name_02, $image_folder_02);
-            move_uploaded_file($image_tmp_name_03, $image_folder_03);
-            $message[] = 'New product added!';
-         }
-      }
-   }  
+        } else {
+            // Insert product into the database
+            $insert_products = $conn->prepare("INSERT INTO `products`(name, manufacturer, type, automobile_type, price, selling_price, details, image_01, image_02, image_03, category, quantity, date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)");
+            $insert_products->execute([$name, $manufacturer, $type, $automobile_type, $price, $selling_price, $details, $image_01, $image_02, $image_03, $category, $quantity, $date]);
+
+            if ($insert_products) {
+                // Move uploaded files to the server
+                move_uploaded_file($image_tmp_name_01, $image_folder_01);
+                move_uploaded_file($image_tmp_name_02, $image_folder_02);
+                move_uploaded_file($image_tmp_name_03, $image_folder_03);
+                $message[] = 'New product added!';
+            }
+        }
+    }
 }
 
-if(isset($_GET['delete'])){
-   $delete_id = $_GET['delete'];
-   $delete_product_image = $conn->prepare("SELECT * FROM `products` WHERE id = ?");
-   $delete_product_image->execute([$delete_id]);
-   $fetch_delete_image = $delete_product_image->fetch(PDO::FETCH_ASSOC);
-   unlink('../uploaded_img/'.$fetch_delete_image['image_01']);
-   unlink('../uploaded_img/'.$fetch_delete_image['image_02']);
-   unlink('../uploaded_img/'.$fetch_delete_image['image_03']);
-   $delete_product = $conn->prepare("DELETE FROM `products` WHERE id = ?");
-   $delete_product->execute([$delete_id]);
-   $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE pid = ?");
-   $delete_cart->execute([$delete_id]);
-   $delete_wishlist = $conn->prepare("DELETE FROM `wishlist` WHERE pid = ?");
-   $delete_wishlist->execute([$delete_id]);
-   header('location:products.php');
-}
+// Handle deletion and archiving
+if (isset($_GET['delete'])) {
+    $delete_id = $_GET['delete'];
 
+    // Fetch product data before deletion
+    $fetch_product = $conn->prepare("SELECT * FROM `products` WHERE id = ?");
+    $fetch_product->execute([$delete_id]);
+    $product_data = $fetch_product->fetch(PDO::FETCH_ASSOC);
+
+    if ($product_data) {
+        // Insert the product data into the archive table (excluding the date)
+        $archive_product = $conn->prepare("INSERT INTO `archived_products` (name, manufacturer, type, automobile_type, price, selling_price, details, image_01, image_02, image_03, category, quantity) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)");
+        $archive_product->execute([
+            $product_data['name'],
+            $product_data['manufacturer'],
+            $product_data['type'],
+            $product_data['automobile_type'],
+            $product_data['price'],
+            $product_data['selling_price'],
+            $product_data['details'],
+            $product_data['image_01'],
+            $product_data['image_02'],
+            $product_data['image_03'],
+            $product_data['category'],
+            $product_data['quantity']
+        ]);
+        // print_r([$name, $manufacturer, $type, $automobile_type, $price, $selling_price, $details, $image_01, $image_02, $image_03, $category, $quantity, $date]);
+        // exit();
+
+        // Delete product images from the server
+        if (file_exists('../uploaded_img/' . $product_data['image_01'])) {
+            unlink('../uploaded_img/' . $product_data['image_01']);
+        }
+        if (file_exists('../uploaded_img/' . $product_data['image_02'])) {
+            unlink('../uploaded_img/' . $product_data['image_02']);
+        }
+        if (file_exists('../uploaded_img/' . $product_data['image_03'])) {
+            unlink('../uploaded_img/' . $product_data['image_03']);
+        }
+
+        // Remove the product from the products table
+        $delete_product = $conn->prepare("DELETE FROM `products` WHERE id = ?");
+        $delete_product->execute([$delete_id]);
+
+        // Redirect back to the products page after deletion
+        header('location:products.php');
+    } else {
+        echo "Product not found!";
+    }
+}
 ?>
+
 
 
 <!DOCTYPE html>
@@ -96,84 +132,7 @@ if(isset($_GET['delete'])){
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
    <link rel="stylesheet" href="../css/admin_style.css">
 </head>
-<style>
-  table img {
-           width: 100px; 
-           height: auto; 
-           object-fit: cover; 
-       }
-.table-container {
-    overflow-x: auto;
-    margin: 20px;
-}
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 12px;
-}
-
-th {
-    background-color: #f4f4f4;
-    font-weight: bold;
-}
-
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-tr:hover {
-    background-color: #f1f1f1;
-}
-
-.product-image {
-    width: 150px;
-    height: auto;
-    object-fit: cover;
-}
-
-.actions {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-}
-
-.option-btn, .delete-btn {
-    text-decoration: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    color: #fff;
-    display: inline-block;
-}
-
-.option-btn {
-    background-color: #4CAF50; /* Green */
-}
-
-.option-btn:hover {
-    background-color: #45a049;
-}
-
-.delete-btn {
-    background-color: #f44336; /* Red */
-}
-
-.delete-btn:hover {
-    background-color: #e53935;
-}
-
-.empty {
-    text-align: center;
-    padding: 20px;
-    color: #888;
-}
-
-</style>
 <body>
 
 <?php include '../components/admin_header.php'; ?>
@@ -286,6 +245,7 @@ tr:hover {
     <table>
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Image 01</th>
                 <th>Name</th>
                 <th>Manufacturer</th>
@@ -305,7 +265,8 @@ tr:hover {
             $select_products->execute();
             if($select_products->rowCount() > 0){
                 while($fetch_product = $select_products->fetch(PDO::FETCH_ASSOC)){ ?>
-                <tr>
+                <tr> 
+                    <td><?=$fetch_product['id'];?></td>
                     <td><img src="../uploaded_img/<?php echo htmlspecialchars($fetch_product['image_01']); ?>" class="product-image" alt=""></td>
                     <td><?php echo htmlspecialchars($fetch_product['name']); ?></td>
                     <td><?php echo htmlspecialchars($fetch_product['manufacturer']); ?></td>
@@ -402,3 +363,84 @@ function selectProduct(id, name, quantity) {
 </script>
 </body>
 </html>
+
+
+
+<style>
+  table img {
+           width: 100px; 
+           height: auto; 
+           object-fit: cover; 
+       }
+.table-container {
+    overflow-x: auto;
+    margin: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+}
+
+th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+.product-image {
+    width: 150px;
+    height: auto;
+    object-fit: cover;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.option-btn, .delete-btn {
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    color: #fff;
+    display: inline-block;
+}
+
+.option-btn {
+    background-color: #4CAF50; /* Green */
+}
+
+.option-btn:hover {
+    background-color: #45a049;
+}
+
+.delete-btn {
+    background-color: #f44336; /* Red */
+}
+
+.delete-btn:hover {
+    background-color: #e53935;
+}
+
+.empty {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+}
+
+</style>
