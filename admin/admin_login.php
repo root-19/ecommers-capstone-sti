@@ -2,6 +2,7 @@
 
 include '../components/connect.php';
 
+$admin_id = $_SESSION['id'];
 session_start();
 
 if(isset($_POST['submit'])){

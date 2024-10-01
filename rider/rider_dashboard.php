@@ -74,7 +74,7 @@ if (isset($_POST['send_data'])) {
 <header class="bg-red-600 p-4 flex justify-between items-center text-white">
     <h1 class="text-xl font-bold">Placed Orders</h1>
     <nav class="flex gap-4">
-        <form action="../components/user_logout" method="POST" class="inline">
+        <form action="logout.php" method="POST" class="inline">
             <button type="submit" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded">Logout</button>
         </form>
     </nav>

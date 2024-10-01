@@ -114,16 +114,34 @@ function processOrder($conn, $user_id, $method, $address, $total_price) {
     }
 }
 
-function generateInvoice($user_name,  $product_names, $product_quantities, $total_price, $method) {
+function generateInvoice($user_name, $product_names, $product_quantities, $total_price, $method) {
+    $invoice_number = round(200010 + rand(1, 1000));
     return "
-    <div id='invoice'>
+    <div id='invoice' style='text-align:center; background-color: white; padding: 20px;'>
+        <!-- Company Logo -->
+        <img src='./uploaded_img/ecommer.jpg' alt='Company Logo' style='width:150px; height:auto; margin-bottom:20px;'>
+        <strong style='font-size: 24px;'>HP Performance Exhaust</strong><br>
+        <p style='font-size: 14px;'>Phone: +123456789 |<br> Email: support@yourcompany.com</p>
+        <!-- Invoice Content -->
         <h1>Invoice</h1>
+        <p><strong>Invoice Number: #$invoice_number</strong></p>
         <p>User Name: $user_name</p>
-
         <p>Payment Method: $method</p>
         <h2>Order Details:</h2>
-        <p>Products: $product_names</p>
-        <p>Quantities: $product_quantities</p>
+        <table style='width: 100%; border-collapse: collapse;'>
+            <thead>
+                <tr>
+                    <th style='border: 1px solid black; padding: 8px;'>Product</th>
+                    <th style='border: 1px solid black; padding: 8px;'>Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style='border: 1px solid black; padding: 8px;'>$product_names</td>
+                    <td style='border: 1px solid black; padding: 8px;'>$product_quantities</td>
+                </tr>
+            </tbody>
+        </table>
         <h3>Total Price: &#8369;$total_price</h3>
     </div>
     ";
@@ -153,29 +171,28 @@ function generateInvoice($user_name,  $product_names, $product_quantities, $tota
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            <?php if (!empty($invoice_html)) { ?>
-                Swal.fire({
-                    title: 'Order Success',
-                    html: `<?= $invoice_html ?>`,
-                    showCloseButton: true,
-                    confirmButtonText: 'Download Invoice',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        var element = document.getElementById('invoice');
-                        var opt = {
-                            margin: 1,
-                            filename: 'invoice.pdf',
-                            image: { type: 'jpeg', quality: 0.98 },
-                            html2pdf: {
-                                orientation: 'portrait',
-                                pageSize: 'A4',
-                            }
-                        };
-                        html2pdf().from(element).set(opt).save();
-                    }
-                });
-            <?php } ?>
+    <?php if (!empty($invoice_html)) { ?>
+        Swal.fire({
+            title: 'Order Success',
+            html: `<?= $invoice_html ?>`,
+            showCloseButton: true,
+            confirmButtonText: 'Download Invoice',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var element = document.getElementById('invoice');
+                var opt = {
+                    margin: 1,
+                    filename: 'invoice.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+                html2pdf().from(element).set(opt).save();
+            }
         });
+    <?php } ?>
+});
+
     </script>
 </head>
 <body>
@@ -217,9 +234,15 @@ function generateInvoice($user_name,  $product_names, $product_quantities, $tota
                 </select>
             </div>
             <div class="inputBox">
-                <span>Address (optional):</span>
-                <input type="text" name="address" placeholder="Enter your address" class="box" maxlength="100">
-            </div>
+            <span>Address (optional):</span>
+            <!-- Button to show address input -->
+            <button type="button" id="show-address-btn" class="box">Add Address</button>
+        </div>
+
+        <!-- Address input (hidden by default) -->
+        <div class="inputBox" id="address-input-box" style="display: none;">
+            <input type="text" name="address" placeholder="Enter your address" class="box" maxlength="100">
+        </div>
         </div>
 
         <div id="qr-code" class="qr-code" style="display: none;">
@@ -237,7 +260,22 @@ function generateInvoice($user_name,  $product_names, $product_quantities, $tota
 </body>
 </html>
 
+<script>
+  
+    const showAddressBtn = document.getElementById('show-address-btn');
+    const addressInputBox = document.getElementById('address-input-box');
 
+ 
+    showAddressBtn.addEventListener('click', function() {
+        if (addressInputBox.style.display === 'none') {
+            addressInputBox.style.display = 'block';
+            showAddressBtn.innerText = 'Hide Address';  
+        } else {
+            addressInputBox.style.display = 'none'; 
+            showAddressBtn.innerText = 'Add Address'; 
+        }
+    });
+</script>
 <style>
         .qr-code {
             display: none;

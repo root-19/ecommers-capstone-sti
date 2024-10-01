@@ -1,2 +1,2 @@
 <?php
-include "user_register.php";
+include "home.php";
