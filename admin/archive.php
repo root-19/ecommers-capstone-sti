@@ -90,7 +90,7 @@ if (!isset($admin_id)) {
                    <th>User ID</th>
                    <th>Name</th>
                    <th>Email</th>
-                   <
+                   
                    <th>Archived At</th>
                </tr>
            </thead>
@@ -159,7 +159,49 @@ if (!isset($admin_id)) {
             <?php } ?>
         </tbody>
     </table>
+</div><h1 class="heading">Return And Refund</h1>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User ID</th>
+                <th>Concern</th>
+                <th>GCash Number</th>
+                <th>Address</th>
+                <th>Image</th> <!-- New Column for Image -->
+            </tr>
+        </thead>
+        <tbody>
+        <?php
+            $select_canceled_orders = $conn->prepare("SELECT * FROM `refunds`");
+            $select_canceled_orders->execute();
+            if ($select_canceled_orders->rowCount() > 0) {
+                while ($fetch_canceled_order = $select_canceled_orders->fetch(PDO::FETCH_ASSOC)) { ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($fetch_canceled_order['order_id']); ?></td>
+                        <td><?php echo htmlspecialchars($fetch_canceled_order['user_id']); ?></td>
+                        <td><?php echo htmlspecialchars($fetch_canceled_order['concern']); ?></td>
+                        <td>&#8369;<?php echo htmlspecialchars($fetch_canceled_order['gcash_number']); ?></td>
+                        <td><?php echo htmlspecialchars($fetch_canceled_order['address']); ?></td>
+                        <td>
+    <img src="../uploads/<?php echo htmlspecialchars($fetch_canceled_order['image_path']); ?>" alt="Refund Image" style="width: 100px; height: auto;">
+</td>
+
+                    </tr>
+                <?php }
+            } else { ?>
+                <tr>
+                    <td colspan="6">No refund and return found.</td> <!-- Adjust colspan to match the number of columns -->
+                </tr>
+            <?php } ?>
+        </tbody>
+    </table>
 </div>
+
+</div>
+
 </section>
 
 <script src="../js/admin_script.js"></script>

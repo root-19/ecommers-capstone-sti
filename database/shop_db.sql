@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 27, 2024 at 01:24 AM
+-- Generation Time: Oct 10, 2024 at 07:47 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -152,7 +152,11 @@ CREATE TABLE `canceled_orders` (
 --
 
 INSERT INTO `canceled_orders` (`id`, `user_id`, `placed_on`, `total_price`, `product_quantities`, `method`, `status`, `deleted_at`) VALUES
-(1, 3, '2024-09-20 06:12:31', 100.00, '1', 'gcash', 'canceled', '2024-09-26 14:36:45');
+(1, 3, '2024-09-20 06:12:31', 100.00, '1', 'gcash', 'canceled', '2024-09-26 14:36:45'),
+(2, 3, '2024-10-07 06:32:29', 100.00, '1', 'cash on delivery', 'canceled', '2024-10-07 13:39:38'),
+(3, 3, '2024-10-07 07:56:48', 100.00, '1', 'cash on delivery', 'canceled', '2024-10-07 14:59:00'),
+(4, 2, '2024-10-07 08:06:27', 100.00, '1', 'cash on delivery', 'canceled', '2024-10-07 15:06:49'),
+(5, 2, '2024-10-07 08:15:13', 100.00, '1', 'cash on delivery', 'canceled', '2024-10-07 15:16:08');
 
 -- --------------------------------------------------------
 
@@ -175,7 +179,8 @@ CREATE TABLE `cart` (
 --
 
 INSERT INTO `cart` (`id`, `user_id`, `pid`, `name`, `price`, `quantity`, `image`) VALUES
-(49, 3, 4, 'test1', 100, 2, 'csph_title.png');
+(77, 3, 5, 'test', 100, 1, 'csph_title.png'),
+(78, 3, 6, 'test2', 100, 1, '55811a63-8cb3-4e80-a803-b3f00955a642.jfif');
 
 -- --------------------------------------------------------
 
@@ -242,49 +247,75 @@ CREATE TABLE `orders` (
   `total_price` decimal(10,2) NOT NULL,
   `receipt_image` varchar(255) DEFAULT NULL,
   `payment_status` enum('pending','completed') DEFAULT 'pending',
+  `tracking_status` enum('packing','shipped','delivered') DEFAULT 'packing',
   `placed_on` timestamp NOT NULL DEFAULT current_timestamp(),
-  `status` varchar(255) DEFAULT NULL
+  `status` varchar(255) DEFAULT NULL,
+  `shipping_status` enum('not shipped','shipped') DEFAULT 'not shipped',
+  `refund_requested` tinyint(1) DEFAULT 0,
+  `refund_status` enum('not_refunded','refunded') DEFAULT 'not_refunded'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `user_id`, `method`, `address`, `product_names`, `product_quantities`, `total_price`, `receipt_image`, `payment_status`, `placed_on`, `status`) VALUES
-(2, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, 'gcash (2).jpg', 'completed', '2024-09-13 15:55:39', 'delivered'),
-(3, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '278249465_518965119829242_3292343790797041615_n.jpg', 'completed', '2024-09-13 16:46:34', 'delivered'),
-(4, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-13 16:47:45', 'delivered'),
-(5, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-14 16:12:47', NULL),
-(6, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-14 16:13:23', NULL),
-(7, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-14 16:16:16', NULL),
-(8, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-14 16:16:39', 'delivered'),
-(10, 3, 'gcash', 'No address provided', 'test', '1', 100.00, 'Screenshot 2024-08-20 060155.png', 'completed', '2024-09-18 16:09:30', NULL),
-(11, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', '', '2024-09-18 16:10:35', NULL),
-(12, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-18 16:11:38', NULL),
-(13, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', '', '2024-09-18 16:11:54', NULL),
-(14, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-18 16:12:04', NULL),
-(15, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-18 16:14:44', NULL),
-(16, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-18 16:15:14', NULL),
-(17, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-18 16:15:24', NULL),
-(18, 3, 'gcash', 'No address provided', 'test', '1', 100.00, 'Screenshot 2024-08-20 060155.png', 'completed', '2024-09-18 16:15:54', NULL),
-(20, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-19 15:28:25', NULL),
-(21, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', '', '2024-09-19 15:28:45', NULL),
-(22, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', '', '2024-09-19 15:31:49', NULL),
-(23, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-19 15:51:43', NULL),
-(24, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-19 15:54:22', NULL),
-(25, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-19 15:59:57', NULL),
-(26, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-19 16:01:07', NULL),
-(27, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-19 16:04:59', NULL),
-(28, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', '', '2024-09-19 16:06:48', NULL),
-(29, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-19 16:10:39', NULL),
-(30, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-20 11:13:22', NULL),
-(31, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-20 11:20:48', NULL),
-(32, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-20 11:24:24', NULL),
-(33, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-20 11:25:01', NULL),
-(34, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-20 11:28:15', NULL),
-(35, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-20 11:29:20', NULL),
-(36, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', '2024-09-20 11:30:17', NULL),
-(39, 2, 'cash on delivery', 'No address provided', 'test1', '1', 100.00, '', 'pending', '2024-09-25 13:37:41', 'delivered');
+INSERT INTO `orders` (`id`, `user_id`, `method`, `address`, `product_names`, `product_quantities`, `total_price`, `receipt_image`, `payment_status`, `tracking_status`, `placed_on`, `status`, `shipping_status`, `refund_requested`, `refund_status`) VALUES
+(2, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, 'gcash (2).jpg', 'completed', 'packing', '2024-09-13 15:55:39', 'delivered', 'not shipped', 0, 'not_refunded'),
+(3, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '278249465_518965119829242_3292343790797041615_n.jpg', 'completed', 'packing', '2024-09-13 16:46:34', 'delivered', 'not shipped', 0, 'not_refunded'),
+(4, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-13 16:47:45', 'delivered', 'not shipped', 0, 'not_refunded'),
+(5, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-14 16:12:47', NULL, 'not shipped', 0, 'not_refunded'),
+(6, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-14 16:13:23', NULL, 'not shipped', 0, 'not_refunded'),
+(7, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-14 16:16:16', NULL, 'not shipped', 0, 'not_refunded'),
+(8, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-14 16:16:39', 'delivered', 'not shipped', 0, 'not_refunded'),
+(10, 3, 'gcash', 'No address provided', 'test', '1', 100.00, 'Screenshot 2024-08-20 060155.png', 'completed', 'packing', '2024-09-18 16:09:30', NULL, 'not shipped', 0, 'not_refunded'),
+(11, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', '', 'packing', '2024-09-18 16:10:35', NULL, 'not shipped', 0, 'not_refunded'),
+(12, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-18 16:11:38', NULL, 'not shipped', 0, 'not_refunded'),
+(13, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', '', 'packing', '2024-09-18 16:11:54', NULL, 'not shipped', 0, 'not_refunded'),
+(14, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-18 16:12:04', NULL, 'not shipped', 0, 'not_refunded'),
+(15, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-18 16:14:44', NULL, 'not shipped', 0, 'not_refunded'),
+(16, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-18 16:15:14', NULL, 'not shipped', 0, 'not_refunded'),
+(17, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-18 16:15:24', NULL, 'not shipped', 0, 'not_refunded'),
+(18, 3, 'gcash', 'No address provided', 'test', '1', 100.00, 'Screenshot 2024-08-20 060155.png', 'completed', 'packing', '2024-09-18 16:15:54', NULL, 'not shipped', 0, 'not_refunded'),
+(20, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-19 15:28:25', NULL, 'not shipped', 0, 'not_refunded'),
+(21, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', '', 'packing', '2024-09-19 15:28:45', NULL, 'not shipped', 0, 'not_refunded'),
+(22, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', '', 'packing', '2024-09-19 15:31:49', NULL, 'not shipped', 0, 'not_refunded'),
+(23, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-19 15:51:43', NULL, 'not shipped', 0, 'not_refunded'),
+(24, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-19 15:54:22', NULL, 'not shipped', 0, 'not_refunded'),
+(25, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-19 15:59:57', NULL, 'not shipped', 0, 'not_refunded'),
+(26, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-19 16:01:07', NULL, 'not shipped', 0, 'not_refunded'),
+(27, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-19 16:04:59', NULL, 'not shipped', 0, 'not_refunded'),
+(28, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', '', 'packing', '2024-09-19 16:06:48', NULL, 'not shipped', 0, 'not_refunded'),
+(29, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-19 16:10:39', NULL, 'not shipped', 0, 'not_refunded'),
+(30, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-20 11:13:22', NULL, 'not shipped', 0, 'not_refunded'),
+(31, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-20 11:20:48', NULL, 'not shipped', 0, 'not_refunded'),
+(32, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-20 11:24:24', NULL, 'not shipped', 0, 'not_refunded'),
+(33, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-20 11:25:01', NULL, 'not shipped', 0, 'not_refunded'),
+(34, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-20 11:28:15', NULL, 'not shipped', 0, 'not_refunded'),
+(35, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-20 11:29:20', NULL, 'not shipped', 0, 'not_refunded'),
+(36, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-09-20 11:30:17', NULL, 'not shipped', 0, 'not_refunded'),
+(41, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-10-01 16:17:33', NULL, 'not shipped', 0, 'not_refunded'),
+(42, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-10-01 16:26:08', NULL, 'not shipped', 0, 'not_refunded'),
+(43, 3, 'cash on delivery', 'No address provided', 'test1', '2', 200.00, '', 'completed', 'packing', '2024-10-01 16:31:16', NULL, 'not shipped', 0, 'not_refunded'),
+(44, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-10-01 16:32:04', NULL, 'not shipped', 0, 'not_refunded'),
+(45, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-10-01 16:45:02', NULL, 'not shipped', 0, 'not_refunded'),
+(46, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-10-01 16:48:40', NULL, 'not shipped', 0, 'not_refunded'),
+(47, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-10-01 16:54:13', NULL, 'not shipped', 0, 'not_refunded'),
+(48, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-10-01 16:55:33', NULL, 'not shipped', 0, 'not_refunded'),
+(49, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-10-01 16:58:55', NULL, 'not shipped', 0, 'not_refunded'),
+(50, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-10-03 15:59:26', NULL, 'not shipped', 0, 'not_refunded'),
+(51, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-10-03 16:06:01', NULL, 'not shipped', 0, 'not_refunded'),
+(52, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-10-03 16:08:13', NULL, 'not shipped', 0, 'not_refunded'),
+(53, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-10-03 16:11:03', NULL, 'not shipped', 0, 'not_refunded'),
+(54, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-10-03 16:14:51', 'delivered', 'not shipped', 0, 'not_refunded'),
+(56, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'packing', '2024-10-07 14:10:15', NULL, 'not shipped', 0, 'not_refunded'),
+(57, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'completed', 'shipped', '2024-10-07 14:31:15', NULL, 'not shipped', 0, 'not_refunded'),
+(59, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '55811a63-8cb3-4e80-a803-b3f00955a642.jfif', 'completed', 'delivered', '2024-10-07 15:00:22', 'delivered', 'not shipped', 0, 'not_refunded'),
+(61, 2, 'gcash', 'No address provided', 'test', '1', 100.00, 'gcash.jpg', 'pending', 'shipped', '2024-10-07 15:07:15', 'delivered', 'not shipped', 0, 'not_refunded'),
+(62, 2, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'pending', 'packing', '2024-10-07 15:09:08', 'delivered', 'not shipped', 0, 'not_refunded'),
+(64, 3, 'cash on delivery', 'No address provided', 'test2', '1', 100.00, '', 'pending', 'delivered', '2024-10-07 15:52:53', 'delivered', 'not shipped', 0, 'not_refunded'),
+(65, 3, 'cash on delivery', 'No address provided', 'test', '1', 100.00, '', 'pending', 'delivered', '2024-10-07 15:53:13', 'delivered', 'not shipped', 0, 'not_refunded'),
+(66, 2, 'cash on delivery', 'No address provided', 'test2', '1', 100.00, '', 'pending', 'delivered', '2024-10-08 09:17:33', 'delivered', 'not shipped', 0, 'not_refunded'),
+(67, 2, 'cash on delivery', 'No address provided', 'test2', '1', 100.00, '', 'pending', 'packing', '2024-10-10 14:57:00', NULL, 'not shipped', 0, 'not_refunded');
 
 -- --------------------------------------------------------
 
@@ -314,7 +345,54 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `manufacturer`, `type`, `automobile_type`, `price`, `selling_price`, `details`, `image_01`, `image_02`, `image_03`, `category`, `quantity`, `date`) VALUES
-(5, 'test', 'test', 'test', 'test', 100.00, 100.00, 'test', 'csph_title.png', 'csph_title.png', 'csph_title.png', 'Car Exhaust', 100, '2024-10-10');
+(5, 'test', 'test', 'test', 'test', 100.00, 100.00, 'test', 'csph_title.png', 'csph_title.png', 'csph_title.png', 'Car Exhaust', 0, '2024-10-10'),
+(6, 'test2', 'test2', 'test2', 'test2', 100.00, 100.00, 'test2', '55811a63-8cb3-4e80-a803-b3f00955a642.jfif', '55811a63-8cb3-4e80-a803-b3f00955a642.jfif', '55811a63-8cb3-4e80-a803-b3f00955a642.jfif', 'Motorcycle Exhaust', 96, '2024-10-23');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `refunds`
+--
+
+CREATE TABLE `refunds` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `concern` text NOT NULL,
+  `gcash_number` varchar(20) NOT NULL,
+  `address` varchar(255) NOT NULL,
+  `image_path` varchar(255) DEFAULT NULL,
+  `user_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `refunds`
+--
+
+INSERT INTO `refunds` (`id`, `order_id`, `concern`, `gcash_number`, `address`, `image_path`, `user_id`, `created_at`) VALUES
+(28, 65, 'adada', 'dada', 'ada', 'uploads/6708041cc9289-4aa2807d-8d35-4935-8999-759485e46d21-20180904180613519_profile.png', 3, '2024-10-10 16:43:08'),
+(29, 64, 'dDdD', 'dadada', 'adada', 'uploads/670805f62d98c-4aa2807d-8d35-4935-8999-759485e46d21-20180904180613519_profile.png', 3, '2024-10-10 16:51:02'),
+(30, 64, 'dDdD', 'dadada', 'adada', '../admin/images/6708076546164-4aa2807d-8d35-4935-8999-759485e46d21-20180904180613519_profile.png', 3, '2024-10-10 16:57:09'),
+(31, 64, 'adda', 'dadada', 'adad', '../admin/images/670807934b83b-9ea6baa9-fb9a-47ee-9e62-742a9ee97ab9.jfif', 3, '2024-10-10 16:57:55'),
+(32, 64, 'adda', 'dadada', 'adad', '../images/670807b8c5f97-9ea6baa9-fb9a-47ee-9e62-742a9ee97ab9.jfif', 3, '2024-10-10 16:58:32'),
+(33, 64, 'dada', 'adad', 'adad', '../images/670807c3cb114-9ea6baa9-fb9a-47ee-9e62-742a9ee97ab9.jfif', 3, '2024-10-10 16:58:43'),
+(34, 64, 'adad', 'dadad', 'dada', '../../images/670807d9f23c0-9ea6baa9-fb9a-47ee-9e62-742a9ee97ab9.jfif', 3, '2024-10-10 16:59:06'),
+(35, 64, 'adad', 'dadad', 'dada', 'uploads/6708083024252-9ea6baa9-fb9a-47ee-9e62-742a9ee97ab9.jfif', 3, '2024-10-10 17:00:32');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `refund_products`
+--
+
+CREATE TABLE `refund_products` (
+  `id` int(11) NOT NULL,
+  `refund_id` int(11) NOT NULL,
+  `product_name` varchar(255) NOT NULL,
+  `product_quantities` int(11) NOT NULL,
+  `total_price` decimal(10,2) NOT NULL,
+  `method` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -336,16 +414,17 @@ CREATE TABLE `users` (
   `mobile` varchar(20) NOT NULL,
   `pin_code` varchar(10) NOT NULL,
   `user_type` enum('admin','user','rider') NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `last` varchar(200) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `house_number`, `street`, `subdivision`, `address`, `city`, `country`, `mobile`, `pin_code`, `user_type`, `created_at`) VALUES
-(2, 'admin', 'wasieacuna@gmail.com', 'd9b3f01220869f2095809214fef10899f9b2234b', '', '', '', 'janlangpo', 'antipolo', 'Philippines', '09510608496', '1990', 'admin', '2024-09-08 13:09:46'),
-(3, 'admin', 'hperformanceexhaust@gmail.com', 'd033e22ae348aeb5660fc2140aec35850c4da997', '', '', '', 'janlangpo', 'antipolo', 'Philippines', '09510608496', '1990', 'rider', '2024-09-08 13:14:26');
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `house_number`, `street`, `subdivision`, `address`, `city`, `country`, `mobile`, `pin_code`, `user_type`, `created_at`, `last`) VALUES
+(2, 'admin', 'wasieacuna@gmail.com', 'd9b3f01220869f2095809214fef10899f9b2234b', '', '', '', 'janlangpo', 'antipolo', 'Philippines', '09510608496', '1990', 'user', '2024-09-08 13:09:46', ''),
+(3, 'admin', 'hperformanceexhaust@gmail.com', 'd033e22ae348aeb5660fc2140aec35850c4da997', '', '', '', 'janlangpo', 'antipolo', 'Philippines', '09510608496', '1990', 'admin', '2024-09-08 13:14:26', '');
 
 -- --------------------------------------------------------
 
@@ -436,6 +515,20 @@ ALTER TABLE `products`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `refunds`
+--
+ALTER TABLE `refunds`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `refund_products`
+--
+ALTER TABLE `refund_products`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `refund_id` (`refund_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -486,13 +579,13 @@ ALTER TABLE `archived_users`
 -- AUTO_INCREMENT for table `canceled_orders`
 --
 ALTER TABLE `canceled_orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT for table `invoices`
@@ -510,13 +603,25 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `refunds`
+--
+ALTER TABLE `refunds`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+
+--
+-- AUTO_INCREMENT for table `refund_products`
+--
+ALTER TABLE `refund_products`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -546,6 +651,18 @@ ALTER TABLE `invoices`
 --
 ALTER TABLE `orders`
   ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `refunds`
+--
+ALTER TABLE `refunds`
+  ADD CONSTRAINT `refunds_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `refund_products`
+--
+ALTER TABLE `refund_products`
+  ADD CONSTRAINT `refund_products_ibfk_1` FOREIGN KEY (`refund_id`) REFERENCES `refunds` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

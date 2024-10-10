@@ -114,31 +114,37 @@ if (isset($_POST['send_data'])) {
                     while ($fetch_orders = $select_pending_orders->fetch(PDO::FETCH_ASSOC)) {
                 ?>
                 <tr class="hover:bg-gray-100">
-                    
-                    <td class="border px-4 py-2"><?= $fetch_orders['placed_on']; ?></td>
-                    <td class="border px-4 py-2"><?= $fetch_orders['name']; ?></td>
-                    <td class="border px-4 py-2"><?= $fetch_orders['mobile']; ?></td>
-                    <td class="border px-4 py-2"><?= $fetch_orders['address']; ?></td>
-                    <td class="border px-4 py-2"><?= $fetch_orders['product_quantities']; ?></td>
-                    <td class="border px-4 py-2">&#8369;<?= $fetch_orders['total_price']; ?>/-</td>
-                    <td class="border px-4 py-2">
-                        <?php if (!empty($fetch_orders['receipt_image'])): ?>
-                            <a href="../uploads/<?= $fetch_orders['receipt_image']; ?>" target="_blank">
-                                <img src="../uploads/<?= $fetch_orders['receipt_image']; ?>" alt="Receipt Image" class="receipt-image">
-                            </a>
-                        <?php else: ?>
-                            No Receipt
-                        <?php endif; ?>
-                    </td>
-                    <td class="border px-4 py-2"><?= $fetch_orders['method']; ?></td>
-                    <td class="border px-4 py-2">
-                        <form action="" method="post" enctype="multipart/form-data" style="display: inline;">
-                            <input type="hidden" name="order_id" value="<?= $fetch_orders['id']; ?>">
-                            <input type="file" name="receipt_image">
-                            <input type="checkbox" name="delivery_status" onchange="this.form.submit()" <?= $fetch_orders['status'] == 'delivered' ? 'checked' : ''; ?>>
-                            <input type="hidden" name="update_delivery">
-                        </form>
-                    </td>
+    <td class="border px-4 py-2"><?= $fetch_orders['id']; ?></td>
+    <td class="border px-4 py-2"><?= $fetch_orders['placed_on']; ?></td>
+    <td class="border px-4 py-2"><?= $fetch_orders['name']; ?></td>
+    <td class="border px-4 py-2"><?= $fetch_orders['mobile']; ?></td>
+    <td class="border px-4 py-2">
+        <a href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($fetch_orders['address']); ?>" target="_blank" class="text-blue-500 underline">
+            <?= htmlspecialchars($fetch_orders['address']); ?>
+        </a>
+    </td>
+    <td class="border px-4 py-2"><?= $fetch_orders['product_quantities']; ?></td>
+    <td class="border px-4 py-2">&#8369;<?= $fetch_orders['total_price']; ?>/-</td>
+    <td class="border px-4 py-2">
+        <?php if (!empty($fetch_orders['receipt_image'])): ?>
+            <a href="../uploads/<?= $fetch_orders['receipt_image']; ?>" target="_blank">
+                <img src="../uploads/<?= $fetch_orders['receipt_image']; ?>" alt="Receipt Image" class="receipt-image">
+            </a>
+        <?php else: ?>
+            No Receipt
+        <?php endif; ?>
+    </td>
+    <td class="border px-4 py-2"><?= $fetch_orders['method']; ?></td>
+    <td class="border px-4 py-2">
+        <form action="" method="post" enctype="multipart/form-data" style="display: inline;">
+            <input type="hidden" name="order_id" value="<?= $fetch_orders['id']; ?>">
+            <input type="file" name="receipt_image">
+            <input type="checkbox" name="delivery_status" onchange="this.form.submit()" <?= $fetch_orders['status'] == 'delivered' ? 'checked' : ''; ?>>
+            <input type="hidden" name="update_delivery">
+        </form>
+    </td>
+</tr>
+
                     <!-- Removed Delete Action -->
                 </tr>
                 <?php

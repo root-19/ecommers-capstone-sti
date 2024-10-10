@@ -250,11 +250,12 @@ h3 {
 .header .flex .navbar a{
    margin:0 1rem;
    font-size: 2rem;
-   color:var(--white);
+   color:var(--light-bg);
+   font: 600;
 }
 
 .header .flex .navbar a:hover{
-   color:var(--light-color);
+   color:var(--main-color);
    text-decoration: underline;
 }
 
@@ -267,11 +268,13 @@ h3 {
 }
 
 .header .flex .icons > *:hover{
-   color:var(--light-color);
+   color:var(--orange);
+   color: #dc2626;
 }
 
 .header .flex .icons a span{
    font-size: 2rem;
+   /* color: #dc2626; */
 }
 
 .header .flex .profile{
@@ -1120,7 +1123,7 @@ section.checkout-orders {
       top:99%; left:0; right:0;
       border-top: var(--border);
       border-bottom: var(--border);
-      background-color: var(--white);
+      background-color: var(--main-color);
       transition: .2s linear;
       clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
    }

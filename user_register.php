@@ -117,24 +117,34 @@ function sendOTP($email) {
             <input type="text" name="name" required placeholder="Enter your first name" maxlength="20" class="box">
             <input type="password" name="cpass" required placeholder="Confirm your password" maxlength="20" class="box">
             <input type="text" name="pin_code" required placeholder="Enter your zip code" maxlength="10" class="box">
-            <!-- <input type="password" name="pass" required placeholder="Enter your password" maxlength="20" class="box"> -->
+           
             <input type="text" name="house_number" required placeholder="House Number" maxlength="10" class="box">
             <input type="text" name="street" required placeholder="Street" maxlength="50" class="box">
-            <!-- <input type="text" name="subdivision" required placeholder="Subdivision" maxlength="50" class="box"> -->
+           
             <input type="text" name="pin_code" required placeholder="Enter your pin code" maxlength="10" class="box">
-            <!-- <input type="text" name="city" required placeholder="City" maxlength="50" class="box"> -->
+           
             
          </div>
          <div class="form-column">
          <input type="text" name="last" required placeholder="Enter your last name" maxlength="20" class="box">
          <input type="password" name="pass" required placeholder="Enter your password" maxlength="20" class="box">
-            <!-- <input type="text" name="pin_code" required placeholder="Enter your zip code" maxlength="10" class="box"> -->
+           
             <input type="email" name="email" required placeholder="Enter your email" maxlength="50" class="box">
-            <input type="text" name="city" required placeholder="City" maxlength="50" class="box">
-            <!-- <input type="password" name="cpass" required placeholder="Confirm your password" maxlength="20" class="box"> -->
-            <!-- <input type="text" name="pin_code" required placeholder="Enter your zip code" maxlength="10" class="box"> -->
-            <!-- <input type="text" name="mobile" required placeholder="Enter your mobile number" maxlength="15" class="box"> -->
-            <!-- <input type="text" name="pin_code" required placeholder="Enter your pin code" maxlength="10" class="box"> -->
+            <!-- <input type="text" name="city" required placeholder="City" maxlength="50" class="box"> -->
+            <select name="city" id="city" maxlength="50" required class="box">
+        <option value="" disabled selected>Select City</option>
+        <option value="New York">New York</option>
+        <option value="Los Angeles">Los Angeles</option>
+        <option value="Chicago">Chicago</option>
+        <option value="Houston">Houston</option>
+        <option value="Phoenix">Phoenix</option>
+        <option value="Philadelphia">Philadelphia</option>
+        <option value="San Antonio">San Antonio</option>
+        <option value="San Diego">San Diego</option>
+        <option value="Dallas">Dallas</option>
+        <option value="San Jose">San Jose</option>
+        <!-- Add more cities as needed -->
+    </select>
             <input type="text" name="subdivision" required placeholder="Subdivision" maxlength="50" class="box">
 
          </div>

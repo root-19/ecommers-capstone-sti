@@ -117,35 +117,45 @@ function processOrder($conn, $user_id, $method, $address, $total_price) {
 function generateInvoice($user_name, $product_names, $product_quantities, $total_price, $method) {
     $invoice_number = round(200010 + rand(1, 1000));
     return "
-    <div id='invoice' style='text-align:center; background-color: white; padding: 20px;'>
+    <div id='invoice' style='text-align: center; background-color: #f9f9f9; padding: 20px; border: 1px solid #ddd; border-radius: 8px; max-width: 600px; margin: auto;'>
         <!-- Company Logo -->
-        <img src='./uploaded_img/ecommer.jpg' alt='Company Logo' style='width:150px; height:auto; margin-bottom:20px;'>
-        <strong style='font-size: 24px;'>HP Performance Exhaust</strong><br>
-        <p style='font-size: 14px;'>Phone: +123456789 |<br> Email: support@yourcompany.com</p>
-        <!-- Invoice Content -->
-        <h1>Invoice</h1>
-        <p><strong>Invoice Number: #$invoice_number</strong></p>
-        <p>User Name: $user_name</p>
-        <p>Payment Method: $method</p>
-        <h2>Order Details:</h2>
-        <table style='width: 100%; border-collapse: collapse;'>
+        <img src='./uploaded_img/ecommer.jpg' alt='Company Logo' style='width: 150px; height: auto; margin-bottom: 20px;'>
+        <h1 style='font-size: 28px; color: #333;'>HP Performance Exhaust</h1>
+        <p style='font-size: 14px; color: #555;'>Phone: +123456789 | Email: support@yourcompany.com</p>
+        
+        
+        <h3 style='font-size: 20px; color: #333;'>Order Details:</h3>
+        <table style='width: 100%; border-collapse: collapse; margin-top: 10px;'>
             <thead>
-                <tr>
-                    <th style='border: 1px solid black; padding: 8px;'>Product</th>
-                    <th style='border: 1px solid black; padding: 8px;'>Quantity</th>
+                <tr style='background-color: #e0e0e0;'>
+                    <th style='border: 1px solid #ddd; padding: 10px; text-align: left;'>Name</th>
+                    <th style='border: 1px solid #ddd; padding: 10px; text-align: left;'>Product</th>
+                    <th style='border: 1px solid #ddd; padding: 10px; text-align: left;'>Payment Method</th>
+                    <th style='border: 1px solid #ddd; padding: 10px; text-align: left;'>Quantity</th>
+                    <th style='border: 1px solid #ddd; padding: 10px; text-align: left;'>Invoice</th>
+
+
+
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td style='border: 1px solid black; padding: 8px;'>$product_names</td>
-                    <td style='border: 1px solid black; padding: 8px;'>$product_quantities</td>
+                    <td style='border: 1px solid #ddd; padding: 10px;'>$user_name</td>
+                    <td style='border: 1px solid #ddd; padding: 10px;'>$product_names</td>
+                    <td style='border: 1px solid #ddd; padding: 10px;'>$method</td>
+                    <td style='border: 1px solid #ddd; padding: 10px;'>$product_quantities</td>
+                     <td style='border: 1px solid #ddd; padding: 10px;'>#$invoice_number</td>
                 </tr>
+   
             </tbody>
         </table>
-        <h3>Total Price: &#8369;$total_price</h3>
+        
+        <h3 style='font-size: 20px; color: #333; margin-top: 20px;'>Total Price: &#8369;$total_price</h3>
     </div>
     ";
 }
+
+
 
 ?>
 <!DOCTYPE html>

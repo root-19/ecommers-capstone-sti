@@ -1,9 +1,11 @@
 <?php
+// Start session at the very top of the script
+session_start();
 
 include '../components/connect.php';
 
-$admin_id = $_SESSION['id'];
-session_start();
+// Only access session variables after session_start
+$admin_id = isset($_SESSION['admin_id']) ? $_SESSION['admin_id'] : null;
 
 if(isset($_POST['submit'])){
 
@@ -12,19 +14,19 @@ if(isset($_POST['submit'])){
    $pass = sha1($_POST['pass']);
    $pass = filter_var($pass, FILTER_SANITIZE_STRING);
 
+   // Prepare SQL query to select admin based on username and password
    $select_admin = $conn->prepare("SELECT * FROM `admins` WHERE name = ? AND password = ?");
    $select_admin->execute([$name, $pass]);
    $row = $select_admin->fetch(PDO::FETCH_ASSOC);
 
+   // Check if admin exists
    if($select_admin->rowCount() > 0){
       $_SESSION['admin_id'] = $row['id'];
-      header('location:dashboard.php');
+      header('location:dashboard.php'); // Redirect to dashboard
    }else{
-      $message[] = 'incorrect username or password!';
+      $message[] = 'Incorrect username or password!';
    }
-
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -36,13 +38,13 @@ if(isset($_POST['submit'])){
    <title>Admin Login</title>
 
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-
    <link rel="stylesheet" href="../css/admin_style.css">
 
 </head>
 <body>
 
 <?php
+   // Display any error messages if they exist
    if(isset($message)){
       foreach($message as $message){
          echo '

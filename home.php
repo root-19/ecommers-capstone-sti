@@ -162,12 +162,17 @@ if ($select_products->rowCount() > 0) {
    <div class="name"><?= $fetch_product['name']; ?></div>
    <div class="flex">
       <div class="price"><span>&#8369;</span><?= $fetch_product['price']; ?><span>/-</span></div>
-      <input type="number" name="qty" class="qty" min="1" max="99" value="1">
+      <input type="number" name="qty" class="qty" min="1" max="<?= $fetch_product['quantity']; ?>" value="1">
    </div>
-   <!-- Add quantity display here -->
    <div class="quantity">Available: <?= $fetch_product['quantity']; ?> pcs</div>
-   <input type="submit" value="add to cart" class="btn" name="add_to_cart">
+   
+   <?php if ($fetch_product['quantity'] > 0) { ?>
+      <input type="submit" value="add to cart" class="btn" name="add_to_cart">
+   <?php } else { ?>
+      <button class="btn" disabled>Out of Stock</button>
+   <?php } ?>
 </form>
+
 <?php
    }
 } else {

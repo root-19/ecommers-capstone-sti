@@ -111,7 +111,7 @@ if(!isset($admin_id)){
       </div>
 
       <!-- Users Count -->
-      <div class="box">
+      <!-- <div class="box">
          <?php
             $select_users = $conn->prepare("SELECT * FROM `users`");
             $select_users->execute();
@@ -120,9 +120,9 @@ if(!isset($admin_id)){
          <h3><?= $number_of_users; ?></h3>
          <p>normal users</p>
          <a href="users_accounts.php" class="btn">see users</a>
-      </div>
+      </div> -->
 
-      <div class="box">
+      <!-- <div class="box">
          <?php
             $select_admins = $conn->prepare("SELECT * FROM `admins`");
             $select_admins->execute();
@@ -131,7 +131,7 @@ if(!isset($admin_id)){
          <h3><?= $number_of_admins; ?></h3>
          <p>admin users</p>
          <a href="admin_accounts.php" class="btn">see admins</a>
-      </div>
+      </div> -->
 
       <!-- New Messages -->
       <div class="box">

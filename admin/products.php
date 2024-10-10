@@ -163,7 +163,7 @@ if (isset($_GET['delete'])) {
         <input type="hidden" name="product_id" id="product_id">
         <div class="inputBox">
             <span>New Quantity</span>
-            <input type="number" name="new_quantity" id="new_quantity" class="box" min="1" required placeholder="Enter new quantity">
+            <input type="number" name="new_quantity" id="new_quantity" class="box" min="0" required placeholder="Enter new quantity">
         </div>
         <input type="submit" value="Update Quantity" class="btn">
     </form>
@@ -256,6 +256,7 @@ if (isset($_GET['delete'])) {
                 <th>Details</th>
                 <th>Category</th>
                 <th>Quantity</th>
+                <th>Date</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -276,7 +277,9 @@ if (isset($_GET['delete'])) {
                     <td>&#8369;<?php echo htmlspecialchars($fetch_product['selling_price']); ?></td>
                     <td><?php echo htmlspecialchars($fetch_product['details']); ?></td>
                     <td><?php echo htmlspecialchars($fetch_product['category']); ?></td>
-                    <td><?php echo htmlspecialchars($fetch_product['quantity']); ?></td>
+                    <td><?php echo htmlspecialchars(max(0, $fetch_product['quantity'])); ?></td>
+                    <td><?php echo htmlspecialchars(max(0, $fetch_product['date'])); ?></td>
+
 
                     
                     <!-- Editable Quantity Form -->
