@@ -145,7 +145,7 @@ if (!isset($admin_id)) {
                         <td><?php echo htmlspecialchars($fetch_canceled_order['method']); ?></td>
                         <td><?php echo htmlspecialchars($fetch_canceled_order['deleted_at']); ?></td>
                         <td>
-                            <form action="send_to_rider.php" method="post" style="display:inline;">
+                            <form action="../rider/send_to_rider.php" method="post" style="display:inline;">
                                 <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($fetch_canceled_order['id']); ?>">
                                 <button type="submit" name="send_data" class="btn">Send to Rider</button>
                             </form>
@@ -159,7 +159,7 @@ if (!isset($admin_id)) {
             <?php } ?>
         </tbody>
     </table>
-</div><h1 class="heading">Return And Refund</h1>
+    <div><h1 class="heading">Return And Refund</h1>
 
 <div class="table-container">
     <table>
@@ -167,6 +167,9 @@ if (!isset($admin_id)) {
             <tr>
                 <th>Order ID</th>
                 <th>User ID</th>
+                <th>Product Name</th>
+                <th>Product Quantity</th>
+                <th>Total Price</th>
                 <th>Concern</th>
                 <th>GCash Number</th>
                 <th>Address</th>
@@ -175,25 +178,36 @@ if (!isset($admin_id)) {
         </thead>
         <tbody>
         <?php
+            // Fetch all refund requests from the refunds table
             $select_canceled_orders = $conn->prepare("SELECT * FROM `refunds`");
             $select_canceled_orders->execute();
+            
             if ($select_canceled_orders->rowCount() > 0) {
                 while ($fetch_canceled_order = $select_canceled_orders->fetch(PDO::FETCH_ASSOC)) { ?>
                     <tr>
                         <td><?php echo htmlspecialchars($fetch_canceled_order['order_id']); ?></td>
                         <td><?php echo htmlspecialchars($fetch_canceled_order['user_id']); ?></td>
+                        <td><?php echo htmlspecialchars($fetch_canceled_order['product_name']); ?></td> <!-- Product Name -->
+                        <td><?php echo htmlspecialchars($fetch_canceled_order['product_quantity']); ?></td> <!-- Product Quantity -->
+                        <td>&#8369;<?php echo htmlspecialchars($fetch_canceled_order['total_price']); ?></td> <!-- Total Price -->
                         <td><?php echo htmlspecialchars($fetch_canceled_order['concern']); ?></td>
-                        <td>&#8369;<?php echo htmlspecialchars($fetch_canceled_order['gcash_number']); ?></td>
+                        <td><?php echo htmlspecialchars($fetch_canceled_order['gcash_number']); ?></td>
                         <td><?php echo htmlspecialchars($fetch_canceled_order['address']); ?></td>
                         <td>
-    <img src="../uploads/<?php echo htmlspecialchars($fetch_canceled_order['image_path']); ?>" alt="Refund Image" style="width: 100px; height: auto;">
+    <?php 
+    // Check if there is an image path
+    if (!empty($fetch_canceled_order['image_path'])) { ?>
+        <img src="../<?php echo htmlspecialchars($fetch_canceled_order['image_path']); ?>" alt="Refund Image" style="width: 100px; height: auto;">
+    <?php } else { ?>
+        <span>No Image Provided</span>
+    <?php } ?>
 </td>
 
                     </tr>
                 <?php }
             } else { ?>
                 <tr>
-                    <td colspan="6">No refund and return found.</td> <!-- Adjust colspan to match the number of columns -->
+                    <td colspan="9">No refund and return found.</td>
                 </tr>
             <?php } ?>
         </tbody>
@@ -201,6 +215,7 @@ if (!isset($admin_id)) {
 </div>
 
 </div>
+
 
 </section>
 

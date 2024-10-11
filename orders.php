@@ -9,44 +9,84 @@ if (isset($_SESSION['id'])) {
     $user_id = '';
 }
 
-// Process refund with additional details
 if (isset($_POST['submit_refund'])) {
+    // Get form data
     $order_id = $_POST['refund_order_id'];
     $concern = $_POST['concern'];
     $gcash_number = $_POST['gcash_number'];
     $address = $_POST['address'];
-    
-    // Handle image upload
-    $image = $_FILES['image'];
-    $imagePath = null;
+    $product_name = $_POST['product_name'];
+    $product_quantity = $_POST['product_quantity'];
+    $total_price = $_POST['total_price'];
 
-    if ($image['error'] === UPLOAD_ERR_OK) {
-        // Define the target directory
-        $targetDirectory = "uploads/"; // Ensure this directory exists and is writable
+   // Initialize variables for image upload
+$image = $_FILES['image'];
+$imagePath = null;
+
+// Allowed image MIME types
+$allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
+// Handle image upload if a file was uploaded
+if ($image['error'] === UPLOAD_ERR_OK) {
+    // Get the MIME type of the uploaded file
+    $fileMimeType = mime_content_type($image['tmp_name']);
+
+    // Check if the uploaded file is an image
+    if (in_array($fileMimeType, $allowedImageTypes)) {
+        // Define the target directory for uploads
+        $targetDirectory = "uploads/"; // Make sure this directory exists and is writable
+        if (!is_dir($targetDirectory)) {
+            mkdir($targetDirectory, 0777, true); // Create the directory if it doesn't exist
+        }
+
+        // Generate a unique name for the image to prevent overwriting
         $imageName = uniqid() . '-' . basename($image['name']);
         $imagePath = $targetDirectory . $imageName;
 
         // Move the uploaded file to the target directory
         if (!move_uploaded_file($image['tmp_name'], $imagePath)) {
             $message[] = 'Failed to upload the image.';
+        } else {
+            // Success message if image upload succeeds
+            $message[] = 'Image uploaded successfully.';
         }
+    } else {
+        // If the file is not an image, display an error
+        $message[] = 'Only image files (JPG, PNG, GIF) are allowed.';
     }
-
- 
-
-    // Insert refund request data into the refund table
-    $insert_refund = $conn->prepare("INSERT INTO `refunds` (order_id, concern, gcash_number, address, image_path, user_id) VALUES (?, ?, ?, ?, ?, ?)");
-    $insert_refund->execute([$order_id, $concern, $gcash_number, $address, $imagePath, $user_id]); // Ensure $user_id is defined
-
-
-    $refund_id = $conn->lastInsertId();
-
-   
-   
-
-    $message[] = 'Refund request submitted successfully for Order ID: ' . $order_id;
+} else {
+    // If no image is uploaded or there is an error, you can add a fallback
+    $message[] = 'No image uploaded or an error occurred during the upload.';
 }
 
+
+    // Fetch product details from the orders table
+    $select_order = $conn->prepare("SELECT product_names, product_quantities, total_price, method FROM `orders` WHERE id = ? AND user_id = ?");
+    $select_order->execute([$order_id, $user_id]);
+
+    if ($select_order->rowCount() > 0) {
+        // Insert refund request into the refunds table
+        $insert_refund = $conn->prepare("
+            INSERT INTO `refunds` (order_id, concern, gcash_number, address, image_path, user_id, product_name, product_quantity, total_price, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+        ");
+        // Execute the query with form and order data
+        $insert_refund->execute([$order_id, $concern, $gcash_number, $address, $imagePath, $user_id, $product_name, $product_quantity, $total_price]);
+
+        // Success message
+        $message[] = 'Refund request submitted successfully for Order ID: ' . $order_id;
+    } else {
+        // If the order does not exist or belongs to a different user
+        $message[] = 'Order not found or you are not authorized to request a refund for this order.';
+    }
+}
+
+// Output any messages
+if (!empty($message)) {
+    foreach ($message as $msg) {
+        echo "<div class='alert alert-info'>{$msg}</div>";
+    }
+}
 
 // var_dump($_POST);
 
@@ -144,14 +184,24 @@ if (isset($_POST['cancel_order'])) {
             <?php if ($order_age < 20): ?>
                 <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" name="update_delivery">Mark as Delivered</button>
                 <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded cancel-order" data-order-id="<?= $fetch_orders['id']; ?>">Cancel Order</button>
+                <button type="button" 
+    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded request-refund"
+    data-order-id="<?= htmlspecialchars($fetch_orders['id']); ?>"
+    data-product-name="<?= htmlspecialchars($fetch_orders['product_names']); ?>"
+    data-product-quantity="<?= htmlspecialchars($fetch_orders['product_quantities']); ?>"
+    data-total-price="<?= htmlspecialchars($fetch_orders['total_price']); ?>">
+    Return/Request Refund
+</button>
             <?php else: ?>
                 <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded cancel-order" data-order-id="<?= $fetch_orders['id']; ?>">Cancel Order</button>
+                <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded request-refund" 
+                data-order-id="<?= htmlspecialchars($fetch_orders['id']); ?>">Return/Request Refund</button>
             <?php endif; ?>
         <?php else: ?>
-            <div class="flex space-x-2">
+            <!-- <div class="flex space-x-2">
     <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded request-refund" 
             data-order-id="<?= htmlspecialchars($fetch_orders['id']); ?>">Return/Request Refund</button>
-</div>
+</div> -->
 
         <?php endif; ?>
     </form>
@@ -167,6 +217,10 @@ if (isset($_POST['cancel_order'])) {
 
             <!-- Product Details Section -->
             <div id="productDetails"></div>
+             <!-- Hidden inputs for product details -->
+             <input type="hidden" name="product_name" id="refundProductName">
+            <input type="hidden" name="product_quantity" id="refundProductQuantity">
+            <input type="hidden" name="total_price" id="refundTotalPrice">
 
             <!-- Concern -->
             <div class="mb-4">
@@ -256,29 +310,42 @@ if (isset($_POST['cancel_order'])) {
         });
     });
 
-    document.addEventListener('DOMContentLoaded', function () {
-        // Get all buttons with the class 'request-refund'
-        const refundButtons = document.querySelectorAll('.request-refund');
+    document.querySelectorAll('.request-refund').forEach(button => {
+    button.addEventListener('click', function() {
+        const orderId = this.getAttribute('data-order-id');
+        const productName = this.getAttribute('data-product-name');
+        const productQuantity = this.getAttribute('data-product-quantity');
+        const totalPrice = this.getAttribute('data-total-price');
 
-        // Add click event listener to each button
-        refundButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                // Get the order ID from the data attribute
-                const orderId = this.getAttribute('data-order-id');
+        // Set hidden input values (these will be submitted with the form)
+        document.getElementById('refundOrderId').value = orderId;
+        document.getElementById('refundProductName').value = productName;
+        document.getElementById('refundProductQuantity').value = productQuantity;
+        document.getElementById('refundTotalPrice').value = totalPrice;
 
-                // Set the order ID in the hidden input field of the refund form
-                document.getElementById('refundOrderId').value = orderId;
+        // Populate product details dynamically for display in the modal
+        document.getElementById('productDetails').innerHTML = `
+            <div class="mb-4">
+                <label class="block mb-1 font-semibold">Product Name</label>
+                <input type="text" class="w-full border border-gray-300 px-3 py-2 rounded" value="${productName}" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block mb-1 font-semibold">Product Quantity</label>
+                <input type="text" class="w-full border border-gray-300 px-3 py-2 rounded" value="${productQuantity}" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block mb-1 font-semibold">Total Price</label>
+                <input type="text" class="w-full border border-gray-300 px-3 py-2 rounded" value="${totalPrice}" readonly>
+            </div>
+        `;
 
-                // Show the refund modal
-                document.getElementById('refundModal').classList.remove('hidden');
-            });
-        });
-
-        // Handle cancel button click to hide modal
-        document.getElementById('cancelRefund').addEventListener('click', function () {
-            document.getElementById('refundModal').classList.add('hidden');
-        });
+        // Show the modal
+        document.getElementById('refundModal').classList.remove('hidden');
     });
+});
+
+
+       
 
 </script>
 <style>

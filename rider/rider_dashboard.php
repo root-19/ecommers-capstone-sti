@@ -45,7 +45,6 @@ if (isset($_POST['send_data'])) {
     }
 }
 
-
 ?>
 
 <!DOCTYPE html>
@@ -81,24 +80,23 @@ if (isset($_POST['send_data'])) {
 </header>
 
 <!-- Main Content -->
-<section class="orders p-4">
+<section class="orders p-4 max-w-7xl mx-auto">
 
     <h2 class="text-2xl font-semibold mb-4">Pending Orders</h2>
     <div class="table-container overflow-x-auto">
-        <table class="min-w-full bg-white">
+        <table class="min-w-full bg-white text-sm md:text-base">
             <thead>
                 <tr>
-                    <th class="border px-4 py92">ID</th>
-                    <th class="border px-4 py-2">Placed On</th>
-                    <th class="border px-4 py-2">Name</th>
-                    <th class="border px-4 py-2">Number</th>
-                    <th class="border px-4 py-2">Address</th>
-                    <th class="border px-4 py-2">Total Products</th>
-                    <th class="border px-4 py-2">Total Price</th>
-                    <th class="border px-4 py-2">Receipt</th>
-                    <th class="border px-4 py-2">Payment Method</th>
-                    <th class="border px-4 py-2">Delivered</th>
-                    
+                    <th class="border px-2 py-2">ID</th>
+                    <th class="border px-2 py-2">Placed On</th>
+                    <th class="border px-2 py-2">Name</th>
+                    <th class="border px-2 py-2">Number</th>
+                    <th class="border px-2 py-2">Address</th>
+                    <th class="border px-2 py-2">Total Products</th>
+                    <th class="border px-2 py-2">Total Price</th>
+                    <th class="border px-2 py-2">Receipt</th>
+                    <th class="border px-2 py-2">Payment Method</th>
+                    <th class="border px-2 py-2">Delivered</th>
                 </tr>
             </thead>
             <tbody>
@@ -114,39 +112,37 @@ if (isset($_POST['send_data'])) {
                     while ($fetch_orders = $select_pending_orders->fetch(PDO::FETCH_ASSOC)) {
                 ?>
                 <tr class="hover:bg-gray-100">
-    <td class="border px-4 py-2"><?= $fetch_orders['id']; ?></td>
-    <td class="border px-4 py-2"><?= $fetch_orders['placed_on']; ?></td>
-    <td class="border px-4 py-2"><?= $fetch_orders['name']; ?></td>
-    <td class="border px-4 py-2"><?= $fetch_orders['mobile']; ?></td>
-    <td class="border px-4 py-2">
-        <a href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($fetch_orders['address']); ?>" target="_blank" class="text-blue-500 underline">
-            <?= htmlspecialchars($fetch_orders['address']); ?>
-        </a>
-    </td>
-    <td class="border px-4 py-2"><?= $fetch_orders['product_quantities']; ?></td>
-    <td class="border px-4 py-2">&#8369;<?= $fetch_orders['total_price']; ?>/-</td>
-    <td class="border px-4 py-2">
-        <?php if (!empty($fetch_orders['receipt_image'])): ?>
-            <a href="../uploads/<?= $fetch_orders['receipt_image']; ?>" target="_blank">
-                <img src="../uploads/<?= $fetch_orders['receipt_image']; ?>" alt="Receipt Image" class="receipt-image">
-            </a>
-        <?php else: ?>
-            No Receipt
-        <?php endif; ?>
-    </td>
-    <td class="border px-4 py-2"><?= $fetch_orders['method']; ?></td>
-    <td class="border px-4 py-2">
-        <form action="" method="post" enctype="multipart/form-data" style="display: inline;">
-            <input type="hidden" name="order_id" value="<?= $fetch_orders['id']; ?>">
-            <input type="file" name="receipt_image">
-            <input type="checkbox" name="delivery_status" onchange="this.form.submit()" <?= $fetch_orders['status'] == 'delivered' ? 'checked' : ''; ?>>
-            <input type="hidden" name="update_delivery">
-        </form>
-    </td>
-</tr>
-
-                    <!-- Removed Delete Action -->
+                    <td class="border px-2 py-2"><?= $fetch_orders['id']; ?></td>
+                    <td class="border px-2 py-2"><?= $fetch_orders['placed_on']; ?></td>
+                    <td class="border px-2 py-2"><?= $fetch_orders['name']; ?></td>
+                    <td class="border px-2 py-2"><?= $fetch_orders['mobile']; ?></td>
+                    <td class="border px-2 py-2">
+                        <a href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($fetch_orders['address']); ?>" target="_blank" class="text-blue-500 underline">
+                            <?= htmlspecialchars($fetch_orders['address']); ?>
+                        </a>
+                    </td>
+                    <td class="border px-2 py-2"><?= $fetch_orders['product_quantities']; ?></td>
+                    <td class="border px-2 py-2">&#8369;<?= $fetch_orders['total_price']; ?>/-</td>
+                    <td class="border px-2 py-2">
+                        <?php if (!empty($fetch_orders['receipt_image'])): ?>
+                            <a href="../uploads/<?= $fetch_orders['receipt_image']; ?>" target="_blank">
+                                <img src="../uploads/<?= $fetch_orders['receipt_image']; ?>" alt="Receipt Image" class="receipt-image">
+                            </a>
+                        <?php else: ?>
+                            No Receipt
+                        <?php endif; ?>
+                    </td>
+                    <td class="border px-2 py-2"><?= $fetch_orders['method']; ?></td>
+                    <td class="border px-2 py-2">
+                        <form action="" method="post" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-center gap-2">
+                            <input type="hidden" name="order_id" value="<?= $fetch_orders['id']; ?>">
+                            <input type="file" name="receipt_image" class="w-full sm:w-auto">
+                            <input type="checkbox" name="delivery_status" onchange="this.form.submit()" <?= $fetch_orders['status'] == 'delivered' ? 'checked' : ''; ?> class="form-checkbox">
+                            <input type="hidden" name="update_delivery">
+                        </form>
+                    </td>
                 </tr>
+
                 <?php
                     }
                 } else {
@@ -157,54 +153,43 @@ if (isset($_POST['send_data'])) {
         </table>
     </div>
 
-    <h3 class="heading">Canceled Orders</h3>
+    <h3 class="text-2xl font-semibold mt-8 mb-4">Canceled Orders</h3>
 
-<div class="table-container">
-    <table class="min-w-full bg-white">
-        <thead>
-            <tr>
-                <th class="border px-4 py-2">Order ID</th>
-                <th class="border px-4 py-2">User ID</th>
-                <th class="border px-4 py-2">Product Quantities</th>
-                <th class="border px-4 py-2">Total Price</th>
-                <th class="border px-4 py-2">Payment Method</th>
-                <th class="border px-4 py-2">Canceled At</th>
-               
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $select_canceled_orders = $conn->prepare("SELECT * FROM `canceled_orders`");
-            $select_canceled_orders->execute();
-            if ($select_canceled_orders->rowCount() > 0) {
-                while ($fetch_canceled_order = $select_canceled_orders->fetch(PDO::FETCH_ASSOC)) { ?>
-                    <tr>
-                        <td class="border px-4 py-2"><?php echo htmlspecialchars($fetch_canceled_order['id']); ?></td>
-                        <td class="border px-4 py-2"><?php echo htmlspecialchars($fetch_canceled_order['user_id']); ?></td>
-                        <td class="border px-4 py-2"><?php echo htmlspecialchars($fetch_canceled_order['product_quantities']); ?></td>
-                        <td class="border px-4 py-2">&#8369;<?php echo htmlspecialchars($fetch_canceled_order['total_price']); ?></td>
-                        <td class="border px-4 py-2"><?php echo htmlspecialchars($fetch_canceled_order['method']); ?></td>
-                        <td class="border px-4 py-2"><?php echo htmlspecialchars($fetch_canceled_order['deleted_at']); ?></td>
-                        <td class="border px-4 py-2">
-                    
-                                <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($fetch_canceled_order['id']); ?>">
-\
-                        </td>
-                    </tr>
-                <?php }
-            } else { ?>
+    <div class="table-container overflow-x-auto">
+        <table class="min-w-full bg-white text-sm md:text-base">
+            <thead>
                 <tr>
-                    <td colspan="7" class="text-center p-4">No canceled orders found.</td>
+                    <th class="border px-2 py-2">Order ID</th>
+                    <th class="border px-2 py-2">User ID</th>
+                    <th class="border px-2 py-2">Product Quantities</th>
+                    <th class="border px-2 py-2">Total Price</th>
+                    <th class="border px-2 py-2">Payment Method</th>
+                    <th class="border px-2 py-2">Canceled At</th>
                 </tr>
-            <?php } ?>
-        </tbody>
-    </table>
-</div>
-
+            </thead>
+            <tbody>
+                <?php
+                $select_canceled_orders = $conn->prepare("SELECT * FROM `canceled_orders`");
+                $select_canceled_orders->execute();
+                if ($select_canceled_orders->rowCount() > 0) {
+                    while ($fetch_canceled_order = $select_canceled_orders->fetch(PDO::FETCH_ASSOC)) { ?>
+                        <tr class="hover:bg-gray-100">
+                            <td class="border px-2 py-2"><?php echo htmlspecialchars($fetch_canceled_order['id']); ?></td>
+                            <td class="border px-2 py-2"><?php echo htmlspecialchars($fetch_canceled_order['user_id']); ?></td>
+                            <td class="border px-2 py-2"><?php echo htmlspecialchars($fetch_canceled_order['product_quantities']); ?></td>
+                            <td class="border px-2 py-2">&#8369;<?php echo htmlspecialchars($fetch_canceled_order['total_price']); ?></td>
+                            <td class="border px-2 py-2"><?php echo htmlspecialchars($fetch_canceled_order['method']); ?></td>
+                            <td class="border px-2 py-2"><?php echo htmlspecialchars($fetch_canceled_order['deleted_at']); ?></td>
+                        </tr>
+                    <?php }
+                } else {
+                    echo '<tr><td colspan="6" class="text-center p-4">No canceled orders found.</td></tr>';
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
 </section>
 
-<script src="../js/admin_script.js"></script>
 </body>
 </html>
-
-
