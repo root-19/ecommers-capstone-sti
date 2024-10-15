@@ -127,10 +127,10 @@ $select_products->execute();
       <h3>Air Filter</h3>
    </a>
 
-   <!-- <a href="category.php?category=others" class="swiper-slide slide">
+   <a href="category.php?category=others" class="swiper-slide slide">
       <img src="images/icon-5.png" alt="">
       <h3>Others</h3>
-   </a> -->
+   </a>
 
    </div>
 

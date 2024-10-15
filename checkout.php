@@ -13,13 +13,27 @@ if (isset($_SESSION['id'])) {
 
 $message = [];
 $invoice_html = '';
+$insufficient_quantity = false; // Flag for insufficient quantities
+$auto_gcash = false; // Flag for automatic GCash payment
 
 if (isset($_POST['order'])) {
+    // Determine the payment method
     $method = $_POST['method'];
     $method = filter_var($method, FILTER_SANITIZE_STRING);
     $address = !empty($_POST['address']) ? 'Address: ' . $_POST['address'] : 'No address provided';
     $address = filter_var($address, FILTER_SANITIZE_STRING);
     $total_price = $_POST['total_price'];
+
+    // Check the number of different products in the cart
+    $check_cart = $conn->prepare("SELECT DISTINCT name FROM `cart` WHERE user_id = ?");
+    $check_cart->execute([$user_id]);
+    $different_products_count = $check_cart->rowCount();
+
+    // Automatically set payment method to GCash if there are 3 or more different products
+    if ($different_products_count >= 3) {
+        $method = 'gcash';
+        $auto_gcash = true;
+    }
 
     if ($method === 'cash on delivery') {
         $pending_orders_check = $conn->prepare("SELECT COUNT(*) AS pending_count FROM `orders` WHERE user_id = ? AND method = 'cash on delivery' AND payment_status = 'pending'");
@@ -29,11 +43,41 @@ if (isset($_POST['order'])) {
         if ($pending_orders_count >= 3) {
             $message[] = 'You have pending orders with Cash on Delivery. You can only place one new Cash on Delivery order until your existing pending orders are completed.';
         } else {
-            $invoice_html = processOrder($conn, $user_id, $method, $address, $total_price);
+            // Check product quantities before processing the order
+            $insufficient_quantity = checkProductQuantities($conn, $user_id);
+            if (!$insufficient_quantity) {
+                $invoice_html = processOrder($conn, $user_id, $method, $address, $total_price);
+            }
         }
     } else {
-        $invoice_html = processOrder($conn, $user_id, $method, $address, $total_price);
+        // Check product quantities before processing the order
+        $insufficient_quantity = checkProductQuantities($conn, $user_id);
+        if (!$insufficient_quantity) {
+            $invoice_html = processOrder($conn, $user_id, $method, $address, $total_price);
+        }
     }
+}
+
+// Function to check product quantities
+function checkProductQuantities($conn, $user_id) {
+    $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE user_id = ?");
+    $check_cart->execute([$user_id]);
+    $cart_items = $check_cart->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($cart_items as $item) {
+        // Get product stock from products table
+        $check_product = $conn->prepare("SELECT quantity FROM `products` WHERE name = ?");
+        $check_product->execute([$item['name']]);
+        $product = $check_product->fetch(PDO::FETCH_ASSOC);
+        
+        if ($product) {
+            // Check if requested quantity exceeds available stock
+            if ($item['quantity'] > $product['quantity']) {
+                return true; // Insufficient quantity
+            }
+        }
+    }
+    return false; // All quantities are sufficient
 }
 
 function processOrder($conn, $user_id, $method, $address, $total_price) {
@@ -123,7 +167,6 @@ function generateInvoice($user_name, $product_names, $product_quantities, $total
         <h1 style='font-size: 28px; color: #333;'>HP Performance Exhaust</h1>
         <p style='font-size: 14px; color: #555;'>Phone: +123456789 | Email: support@yourcompany.com</p>
         
-        
         <h3 style='font-size: 20px; color: #333;'>Order Details:</h3>
         <table style='width: 100%; border-collapse: collapse; margin-top: 10px;'>
             <thead>
@@ -133,9 +176,6 @@ function generateInvoice($user_name, $product_names, $product_quantities, $total
                     <th style='border: 1px solid #ddd; padding: 10px; text-align: left;'>Payment Method</th>
                     <th style='border: 1px solid #ddd; padding: 10px; text-align: left;'>Quantity</th>
                     <th style='border: 1px solid #ddd; padding: 10px; text-align: left;'>Invoice</th>
-
-
-
                 </tr>
             </thead>
             <tbody>
@@ -144,20 +184,17 @@ function generateInvoice($user_name, $product_names, $product_quantities, $total
                     <td style='border: 1px solid #ddd; padding: 10px;'>$product_names</td>
                     <td style='border: 1px solid #ddd; padding: 10px;'>$method</td>
                     <td style='border: 1px solid #ddd; padding: 10px;'>$product_quantities</td>
-                     <td style='border: 1px solid #ddd; padding: 10px;'>#$invoice_number</td>
+                    <td style='border: 1px solid #ddd; padding: 10px;'>$invoice_number</td>
                 </tr>
-   
             </tbody>
         </table>
-        
-        <h3 style='font-size: 20px; color: #333; margin-top: 20px;'>Total Price: &#8369;$total_price</h3>
+        <h2 style='margin-top: 20px;'>Total Price: $total_price</h2>
     </div>
     ";
 }
-
-
-
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -203,11 +240,24 @@ function generateInvoice($user_name, $product_names, $product_quantities, $total
     <?php } ?>
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+        <?php if ($insufficient_quantity): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Insufficient Quantity',
+                text: 'One or more items in your cart exceed the available quantity. Please adjust your order.',
+                confirmButtonText: 'OK'
+            });
+        <?php endif; ?>
+    });
+
     </script>
 </head>
 <body>
 
 <?php include 'components/user_header.php'; ?>
+<!-- Tailwind CSS CDN -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 
 <section class="checkout-orders">
 
@@ -246,14 +296,105 @@ function generateInvoice($user_name, $product_names, $product_quantities, $total
             <div class="inputBox">
             <span>Address (optional):</span>
             <!-- Button to show address input -->
-            <button type="button" id="show-address-btn" class="box">Add Address</button>
+            <button type="button" id="show-address-btn" class="box">update Address</button>
         </div>
+<?php
+// $user_id = $_SESSION['user_id'];
 
-        <!-- Address input (hidden by default) -->
+// Check if the form has been submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get the form data and update the user's address
+    $address = $_POST['address'];
+    $house_number = $_POST['house_number'];
+    $street = $_POST['street'];
+    $subdivision = $_POST['subdivision'];
+    $pin_point = $_POST['pin_point'];
+
+    // Prepare the SQL statement to update the user's address details
+    $sql = "UPDATE users SET address = :address, house_number = :house_number, street = :street, subdivision = :subdivision, pin_point = :pin_point WHERE id = :user_id";
+    $stmt = $conn->prepare($sql);
+
+    // Bind the parameters
+    $stmt->bindValue(':address', $address);
+    $stmt->bindValue(':house_number', $house_number);
+    $stmt->bindValue(':street', $street);
+    $stmt->bindValue(':subdivision', $subdivision);
+    $stmt->bindValue(':pin_point', $pin_point);
+    $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+
+    if ($stmt->execute()) {
+        // If successful, show SweetAlert success message
+        echo "<script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Address updated successfully!'
+            });
+        </script>";
+    } else {
+        // If there is an error, show SweetAlert error message
+        echo "<script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to update address!'
+            });
+        </script>";
+    }
+}
+
+// Fetch the user's address details to populate the form
+$sql = "SELECT address, house_number, street, subdivision, pin_point FROM users WHERE id = :user_id";
+$stmt = $conn->prepare($sql);
+$stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+$stmt->execute();
+$user_data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+?>
+
+<div class="container mx-auto p-4">
+        <!-- Button to show the address form -->
+        <!-- <button id="show-address-form" class="bg-blue-500 text-white px-4 py-2 rounded mb-4">Edit Address</button> -->
+
+        <!-- Address input form (initially hidden) -->
         <div class="inputBox" id="address-input-box" style="display: none;">
-            <input type="text" name="address" placeholder="Enter your address" class="box" maxlength="100">
+            <form action="" method="POST">
+                <div class="mb-4">
+                    <label for="address" class="block text-sm font-semibold">Address:</label>
+                    <input type="text" name="address" id="address" class="box w-full p-2 border" value="<?= htmlspecialchars($user_data['address']) ?>">
+                </div>
+
+                <div class="mb-4">
+                    <label for="house_number" class="block text-sm font-semibold">House Number:</label>
+                    <input type="text" name="house_number" id="house_number" class="box w-full p-2 border" value="<?= htmlspecialchars($user_data['house_number']) ?>">
+                </div>
+
+                <div class="mb-4">
+                    <label for="streets" class="block text-sm font-semibold">Streets:</label>
+                    <input type="text" name="street" id="street" class="box w-full p-2 border" value="<?= htmlspecialchars($user_data['street']) ?>">
+                </div>
+
+                <div class="mb-4">
+                    <label for="subdivision" class="block text-sm font-semibold">Subdivision:</label>
+                    <input type="text" name="subdivision" id="subdivision" class="box w-full p-2 border" value="<?= htmlspecialchars($user_data['subdivision']) ?>">
+                </div>
+
+                <div class="mb-4">
+                    <label for="pin_point" class="block text-sm font-semibold">Pin Point:</label>
+                    <input type="text" name="pin_point" id="pin_point" class="box w-full p-2 border" value="<?= htmlspecialchars($user_data['pin_point']) ?>">
+                </div>
+
+                <button type="submit" class="bg-red-500 text-white w-full p-2 rounded">Update</button>
+            </form>
         </div>
-        </div>
+</div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Show the form when the button is clicked
+        $('#show-address-form').on('click', function() {
+            $('#address-input-box').toggle();
+        });
+    </script>
 
         <div id="qr-code" class="qr-code" style="display: none;">
             <p>Scan the QR code to pay with Gcash:</p>

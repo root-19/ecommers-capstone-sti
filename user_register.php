@@ -17,13 +17,15 @@ if (isset($_POST['submit'])) {
     $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
     $pass = filter_var(trim($_POST['pass']), FILTER_SANITIZE_STRING);
     $cpass = filter_var(trim($_POST['cpass']), FILTER_SANITIZE_STRING);
-
+    $address = filter_var(trim($_POST['address']), FILTER_SANITIZE_STRING);
+    
     $house_number = filter_var(trim($_POST['house_number']), FILTER_SANITIZE_STRING);
     $street = filter_var(trim($_POST['street']), FILTER_SANITIZE_STRING);
     $subdivision = filter_var(trim($_POST['subdivision']), FILTER_SANITIZE_STRING);
     $city = filter_var(trim($_POST['city']), FILTER_SANITIZE_STRING);
     $mobile = filter_var(trim($_POST['mobile']), FILTER_SANITIZE_STRING);
     $pin_code = filter_var(trim($_POST['pin_code']), FILTER_SANITIZE_STRING);
+    $pin_point = filter_var(trim($_POST['pin_point']), FILTER_SANITIZE_STRING);
 
     // Validate email
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -47,8 +49,8 @@ if (isset($_POST['submit'])) {
                 $user_type = 'user'; 
 
                 // Insert user into the database
-                $insert_user = $conn->prepare("INSERT INTO `users` (name, email, password, house_number, street, subdivision, city, mobile, pin_code, user_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                if ($insert_user->execute([$name, $email, $hashed_pass, $house_number, $street, $subdivision, $city, $mobile, $pin_code, $user_type])) {
+                $insert_user = $conn->prepare("INSERT INTO `users` (name,address, email, password, house_number, street, subdivision, city, mobile, pin_code,pin_point user_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                if ($insert_user->execute([$name, $address, $email, $hashed_pass, $house_number, $street, $subdivision, $city, $mobile, $pin_code,$pin_point, $user_type])) {
                     // Send OTP email
                     sendOTP($email);
                     header("Location: otp-verify.php"); 
@@ -146,6 +148,8 @@ function sendOTP($email) {
         <!-- Add more cities as needed -->
     </select>
             <input type="text" name="subdivision" required placeholder="Subdivision" maxlength="50" class="box">
+            <input type="text" name="pin_point" required placeholder=" pin point location"  class="box">
+            <input type="text" name="address" required placeholder="address"  class="box">
 
          </div>
       </div>

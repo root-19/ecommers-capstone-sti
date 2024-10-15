@@ -157,6 +157,14 @@ if (isset($_POST['cancel_order'])) {
             </thead>
             <tbody>
                 <?php
+
+                // Fetch the user's address details to populate the form
+$sql = "SELECT address, house_number, street, subdivision, pin_point FROM users WHERE id = :user_id";
+$stmt = $conn->prepare($sql);
+$stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+$stmt->execute();
+$user_data = $stmt->fetch(PDO::FETCH_ASSOC);
+
                 // Query only orders of the logged-in user
                 $select_pending_orders = $conn->prepare("SELECT * FROM `orders` WHERE payment_status = 'pending' AND user_id = ?");
                 $select_pending_orders->execute([$user_id]);
@@ -181,23 +189,101 @@ if (isset($_POST['cancel_order'])) {
     <form action="" method="post" class="flex flex-col items-center">
         <input type="hidden" name="order_id" value="<?= $fetch_orders['id']; ?>">
         <?php if ($fetch_orders['status'] != 'delivered'): ?>
-            <?php if ($order_age < 20): ?>
+     <!-- Add the View button -->
+<button type="button" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded view-buttons" data-order-id="<?= $fetch_orders['id']; ?>">View</button>
+
+<!-- Modal structure for displaying order details and action buttons (initially hidden) -->
+<div id="modal-<?= $fetch_orders['id']; ?>" class="fixed inset-0 hidden bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-xl">
+        <!-- Close button -->
+        <button type="button" class="close-modal text-gray-500 hover:text-gray-800 text-lg float-right">&times;</button>
+        
+        <!-- Order Details (No Table) -->
+        <h2 class="text-lg font-bold mb-4">Order Details</h2>
+        
+        <div class="mb-4">
+            <span class="font-semibold">Order ID:</span>
+            <span><?= $fetch_orders['id']; ?></span>
+        </div>
+        
+        <div class="mb-4">
+            <span class="font-semibold">Placed On:</span>
+            <span><?= $fetch_orders['placed_on']; ?></span>
+        </div>
+
+        <div class="mb-4">
+            <span class="font-semibold">Product Names:</span>
+            <span><?= $fetch_orders['product_names']; ?></span>
+        </div>
+
+        <div class="mb-4">
+            <span class="font-semibold">Total Products:</span>
+            <span><?= $fetch_orders['product_quantities']; ?></span>
+        </div>
+
+        <div class="mb-4">
+            <span class="font-semibold">Total Price:</span>
+            <span><?= $fetch_orders['total_price']; ?></span>
+        </div>
+
+        <div class="mb-4">
+            <span class="font-semibold">Payment Method:</span>
+            <span><?= $fetch_orders['method']; ?></span>
+        </div>
+
+        <div class="mb-4">
+            <span class="font-semibold">Order Status:</span>
+            <span><?= $fetch_orders['status']; ?></span>
+        </div>
+
+        <div class="mb-4">
+            <span class="font-semibold">Tracking Status:</span>
+            <span><?= $fetch_orders['tracking_status']; ?></span>
+        </div>
+
+
+        <div class="mb-4">
+    <label for="address" class="block text-sm font-semibold">Address:</label>
+    <input type="text" name="address" id="address"  value="<?= htmlspecialchars($user_data['address']) ?>" readonly>
+</div>
+
+<div class="mb-4">
+    <label for="house_number" class="block text-sm font-semibold">House Number:</label>
+    <input type="text" name="house_number" id="house_number"  value="<?= htmlspecialchars($user_data['house_number']) ?>" readonly>
+</div>
+
+<div class="mb-4">
+    <label for="streets" class="block text-sm font-semibold">Streets:</label>
+    <input type="text" name="street" id="street" value="<?= htmlspecialchars($user_data['street']) ?>" readonly>
+</div>
+
+<div class="mb-4">
+    <label for="subdivision" class="block text-sm font-semibold">Subdivision:</label>
+    <input type="text" name="subdivision" id="subdivision" value="<?= htmlspecialchars($user_data['subdivision']) ?>" readonly>
+</div>
+
+<div class="mb-4">
+    <label for="pin_point" class="block text-sm font-semibold">Pin Point:</label>
+    <input type="text" name="pin_point" id="pin_point"  value="<?= htmlspecialchars($user_data['pin_point']) ?>" readonly>
+</div>
+
+
+        <!-- Action Buttons -->
+        <?php if ($order_age < 20): ?>
+            <div class="mt-6">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" name="update_delivery">Mark as Delivered</button>
                 <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded cancel-order" data-order-id="<?= $fetch_orders['id']; ?>">Cancel Order</button>
-                <button type="button" 
-    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded request-refund"
-    data-order-id="<?= htmlspecialchars($fetch_orders['id']); ?>"
-    data-product-name="<?= htmlspecialchars($fetch_orders['product_names']); ?>"
-    data-product-quantity="<?= htmlspecialchars($fetch_orders['product_quantities']); ?>"
-    data-total-price="<?= htmlspecialchars($fetch_orders['total_price']); ?>">
-    Return/Request Refund
-</button>
-            <?php else: ?>
-                <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded cancel-order" data-order-id="<?= $fetch_orders['id']; ?>">Cancel Order</button>
-                <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded request-refund" 
-                data-order-id="<?= htmlspecialchars($fetch_orders['id']); ?>">Return/Request Refund</button>
-            <?php endif; ?>
-        <?php else: ?>
+                <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded request-refund"
+                    data-order-id="<?= htmlspecialchars($fetch_orders['id']); ?>"
+                    data-product-name="<?= htmlspecialchars($fetch_orders['product_names']); ?>"
+                    data-product-quantity="<?= htmlspecialchars($fetch_orders['product_quantities']); ?>"
+                    data-total-price="<?= htmlspecialchars($fetch_orders['total_price']); ?>">
+                    Return/Request Refund
+                </button>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
             <!-- <div class="flex space-x-2">
     <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded request-refund" 
             data-order-id="<?= htmlspecialchars($fetch_orders['id']); ?>">Return/Request Refund</button>
@@ -268,7 +354,27 @@ if (isset($_POST['cancel_order'])) {
 </section>
 
 <?php include 'components/footer.php'; ?>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+   $(document).ready(function(){
+        // When the "View" button is clicked, show the modal
+        $('.view-buttons').click(function(){
+            var orderId = $(this).data('order-id');
+            $('#modal-' + orderId).removeClass('hidden');
+        });
 
+        // Close the modal when the close button is clicked or anywhere outside the modal content
+        $('.close-modal').click(function(){
+            $(this).closest('.fixed').addClass('hidden');
+        });
+
+        $(window).click(function(event) {
+            if ($(event.target).hasClass('fixed')) {
+                $(event.target).addClass('hidden');
+            }
+        });
+    });
+</script>
 <script src="js/script.js"></script>
 <script>
     // SweetAlert for cancel confirmation

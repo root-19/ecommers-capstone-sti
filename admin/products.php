@@ -168,6 +168,9 @@ if (isset($_GET['delete'])) {
         <input type="submit" value="Update Quantity" class="btn">
     </form>
 </section>
+<!-- <section class="add-productss" id="selectProductForm">
+<input type="submit" value="Update Quantity" class="btn">
+</section> -->
 
 <section class="add-products" id="addProductForm">
    <h1 class="heading">Add Product</h1>
@@ -333,9 +336,22 @@ document.getElementById('ProductBtn').addEventListener('click', function() {
 
 // Hide pop-up when clicking outside the form
 document.getElementById('overlay').addEventListener('click', function() {
-    document.getElementById('updateProductForm').classList.remove('active');
+    document.getElementById('selectProductForm').classList.remove('active');
     document.getElementById('overlay').classList.remove('active');
 });
+
+// Show the form when the button is clicked
+addProductBtn.addEventListener('click', function() {
+      addProductForm.classList.add('active');
+      overlay.classList.add('active');
+   });
+
+   // Hide the form when the overlay is clicked
+   overlay.addEventListener('click', function() {
+      addProductForm.classList.remove('active');
+      overlay.classList.remove('active');
+   });
+
 
 // Function to search for products as the user types
 function searchProduct(query) {
