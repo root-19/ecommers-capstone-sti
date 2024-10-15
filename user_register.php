@@ -49,7 +49,8 @@ if (isset($_POST['submit'])) {
                 $user_type = 'user'; 
 
                 // Insert user into the database
-                $insert_user = $conn->prepare("INSERT INTO `users` (name,address, email, password, house_number, street, subdivision, city, mobile, pin_code,pin_point user_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $insert_user = $conn->prepare("INSERT INTO `users` (name, address, email, password, house_number, street, subdivision, city, mobile, pin_code, pin_point, user_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
                 if ($insert_user->execute([$name, $address, $email, $hashed_pass, $house_number, $street, $subdivision, $city, $mobile, $pin_code,$pin_point, $user_type])) {
                     // Send OTP email
                     sendOTP($email);
@@ -122,6 +123,8 @@ function sendOTP($email) {
            
             <input type="text" name="house_number" required placeholder="House Number" maxlength="10" class="box">
             <input type="text" name="street" required placeholder="Street" maxlength="50" class="box">
+            <input type="text" name="mobile" required placeholder="mobile" maxlength="11" class="box">
+
            
             <input type="text" name="pin_code" required placeholder="Enter your pin code" maxlength="10" class="box">
            
