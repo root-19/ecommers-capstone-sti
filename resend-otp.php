@@ -11,7 +11,7 @@ if(isset($_SESSION['user_email'])){
     header("Location: otp_verify.php");
     exit();
 } else {
-    header("Location: register.php");
+    header("Location: user_register.php");
     exit();
 }
 

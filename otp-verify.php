@@ -34,7 +34,7 @@ if(isset($_POST['verify_otp'])){
         <h3>Verify OTP</h3>
         <input type="text" name="otp" required placeholder="Enter your OTP" maxlength="7" class="box">
         <input type="submit" value="Verify OTP" class="btn" name="verify_otp">
-        <!-- <p>If you didn't receive the OTP, please check your spam folder or <a href="resend-otp.php" class="option-btn">resend OTP</a>.</p> -->
+        <p>If you didn't receive the OTP, please check your spam folder or <a href="resend-otp.php" class="option-btn">resend OTP</a>.</p>
     </form>
 
     <?php
