@@ -13,8 +13,8 @@ if (isset($_SESSION['id'])) {
 
 $message = [];
 $invoice_html = '';
-$insufficient_quantity = false; // Flag for insufficient quantities
-$auto_gcash = false; // Flag for automatic GCash payment
+$insufficient_quantity = false; 
+$auto_gcash = false; 
 
 if (isset($_POST['order'])) {
     // Determine the payment method

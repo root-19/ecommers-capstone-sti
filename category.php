@@ -2,13 +2,14 @@
 include 'components/connect.php';
 session_start();
 
-if (!isset($_SESSION['id'])) {
-    header('location:user_login.php');
-    exit();
-}
 
-$user_id = $_SESSION['user_id'];
+// session_start();
 
+if(isset($_SESSION['id'])){
+   $user_id = $_SESSION['id'];
+}else{
+   $user_id = '';
+};
 // Get the category from the URL
 $category = isset($_GET['category']) ? $_GET['category'] : '';
 

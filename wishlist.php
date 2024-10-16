@@ -4,11 +4,13 @@ include 'components/connect.php';
 
 session_start();
 
-if(isset($_SESSION['user_id'])){
-   $user_id = $_SESSION['user_id'];
+
+// session_start();
+
+if(isset($_SESSION['id'])){
+   $user_id = $_SESSION['id'];
 }else{
    $user_id = '';
-   header('location:user_login.php');
 };
 
 include 'components/wishlist_cart.php';

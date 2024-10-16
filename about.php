@@ -8,7 +8,7 @@ if(isset($_SESSION['id'])){
    $user_id = $_SESSION['id'];
 }else{
    $user_id = '';
-}
+};
 
 // Handle review form submission
 if (isset($_POST['submit_review'])) {
